@@ -36,7 +36,7 @@
 
 bool hashmap_exists(const map_t * map, const char * key) {
     struct hashmap_element * element;
-    bool found;
+    bool found = false;
     int index;
 
     index = hashmap_hash(map, key);
@@ -47,7 +47,7 @@ bool hashmap_exists(const map_t * map, const char * key) {
         element = element->next_element;
         while(element) {
             if(strcmp(element->key, key) == 0) {
-                found = false;
+                found = true;
                 break;
             }
         }

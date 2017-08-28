@@ -26,6 +26,7 @@
 #include <potato/main.h>
 #include <potato/constants.h>
 #include <potato/hashmap.h>
+#include <potato/ring_buffer.h>
 
 // System dependencies.
 #include <stdio.h>
