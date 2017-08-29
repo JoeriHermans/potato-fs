@@ -82,20 +82,22 @@
 #define ring_buffer_peek_tail(BUFFER) (BUFFER)->buffer[BUFFER.index_tail]
 
 #define ring_buffer_insert_buffer(BUFFER, ELEMENTS, NUM_ELEMENTS) \
+    { \
+    int index = (BUFFER)->index_tail; \
     for(size_t i = 0; i < NUM_ELEMENTS; ++i) { \
-    int next_index = ring_buffer_next_tail_index(BUFFER); \
-    (BUFFER)->buffer[next_index] = ELEMENTS[i]; \
+    (BUFFER)->buffer[index] = ELEMENTS[i]; \
+    index = ring_buffer_next_tail_index(BUFFER); \
+    (BUFFER)->index_tail = index; \
     } \
-    (BUFFER)->index_tail = ((BUFFER)->index_tail + NUM_ELEMENTS) % ((BUFFER)->size + 1);
+    }
 
 #define ring_buffer_read_buffer(BUFFER, ELEMENT_BUFFER, BUFFER_SIZE) \
     { \
     int index = (BUFFER)->index_head; \
     for(size_t i = 0; i < BUFFER_SIZE; ++i) { \
-        ELEMENT_BUFFER[i] = (BUFFER)->buffer[index]; \
-        index = ring_buffer_next_head_index(BUFFER); \
+        ELEMENT_BUFFER[i] = (BUFFER)->buffer[index + i]; \
     } \
-    (BUFFER)->index_head = ((BUFFER)->index_head + BUFFER_SIZE) % ((BUFFER)->size + 1); \
+    (BUFFER)->index_head = ((BUFFER)->index_head + BUFFER_SIZE + 1) % ((BUFFER)->size + 1); \
     }
 
 ring_buffer_define(char, ring_buffer_char_t);
@@ -103,5 +105,17 @@ ring_buffer_define(double, ring_buffer_double_t);
 ring_buffer_define(float, ring_buffer_float_t);
 ring_buffer_define(int, ring_buffer_int_t);
 ring_buffer_define(long, ring_buffer_long_t);
+
+int ring_buffer_char_index_of(const ring_buffer_char_t * buffer, const char element);
+
+int ring_buffer_double_index_of(const ring_buffer_double_t * buffer, const double element);
+
+int ring_buffer_float_index_of(const ring_buffer_float_t * buffer, const float element);
+
+int ring_buffer_int_index_of(const ring_buffer_int_t * buffer, const int element);
+
+int ring_buffer_long_index_of(const ring_buffer_long_t * buffer, const long element);
+
+int ring_buffer_dindex_head(const int index_head, const int size, const int index);
 
 #endif

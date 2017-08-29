@@ -28,6 +28,8 @@
 
 extern const char k_usage[];
 
+extern const char k_newline;
+
 extern const char k_arg_config[];
 extern const char k_arg_config_s[];
 extern const char k_arg_daemon[];

@@ -34,6 +34,8 @@ const char k_usage[] = "PotatoFS 0.0.1\n"
                        "\n"
                        "User:\n";
 
+const char k_newline = '\n';
+
 const char k_arg_config[] = "--config";
 const char k_arg_config_s[] = "-c";
 const char k_arg_daemon[] = "--daemon";

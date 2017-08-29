@@ -27,6 +27,7 @@
 #include <potato/constants.h>
 #include <potato/hashmap.h>
 #include <potato/ring_buffer.h>
+#include <potato/config_parser.h>
 
 // System dependencies.
 #include <stdio.h>
@@ -57,16 +58,20 @@ int main(const int argc, const char ** argv) {
 
 int run_mode_daemon(const int argc, const char ** argv) {
     char path_configuration[PATH_MAX + 1];
+    map_t * properties;
+    int rc;
 
     syslog(LOG_NOTICE, k_log_initializing);
     fetch_configuration_path(path_configuration, argc, argv);
     syslog(LOG_NOTICE, k_log_open_config, path_configuration);
-    if(access(path_configuration, F_OK) == -1) {
-        syslog(LOG_ERR, k_log_open_config_error, path_configuration);
-        syslog(LOG_ERR, k_log_stop_cause_error);
-
-        return EXIT_FAILURE;
+    properties = hashmap_new();
+    rc = config_parser_read(properties, path_configuration);
+    if(rc == 0) {
+        syslog(LOG_NOTICE, "Success!");
+    } else {
+        syslog(LOG_ERR, "No success :(");
     }
+    hashmap_free(properties);
 
     return EXIT_SUCCESS;
 }

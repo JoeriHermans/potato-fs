@@ -43,9 +43,19 @@
 #define CONFIG_PARSER_STATUS_OK 0
 #define CONFIG_PARSER_STATUS_COULDNT_OPEN -1
 #define CONFIG_PARSER_KEY_COLLISION -2
+#define CONFIG_PARSER_EOF_REACHED -3
+#define CONFIG_PARSER_READ_ERROR -4
+#define CONFIG_PARSER_BUFFER_OVERFLOW -5
+
+bool config_parser_is_blank_line(const char * line_buffer);
 
 int config_parser_read(map_t * properties, const char * path);
 
-void config_parser_process_file(const int fd, ring_buffer_char_t * buffer, map_t * properties);
+int config_parser_read_line(const int fd, ring_buffer_char_t * ring_buffer,
+                            char * line_buffer, const size_t line_buffer_size);
+
+void config_parser_filter_line(char * line_buffer);
+
+void config_parser_process_file(const int fd, ring_buffer_char_t * ring_buffer, map_t * properties);
 
 #endif
