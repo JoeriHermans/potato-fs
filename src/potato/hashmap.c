@@ -62,7 +62,6 @@ int hashmap_get(const map_t * map, const char * key, void ** buffer) {
     int index;
 
     index = hashmap_hash(map, key);
-    status = HASHMAP_STATUS_NOT_FOUND;
     element = &map->bin[index];
     if(strcmp(element->key, key) == 0) {
         status = HASHMAP_STATUS_OK;

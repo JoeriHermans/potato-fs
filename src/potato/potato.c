@@ -55,32 +55,80 @@ static struct fuse_operations potato_operations = {
 };
 
 int potato_initialize(const int argc, const char ** argv, const map_t * settings) {
+    static char * program_argument[1];
+    program_argument[0] = "potato";
+    static struct fuse_args fuse_arguments = FUSE_ARGS_INIT(1, program_argument);
+    struct potatofs potatofs;
+    struct fuse_session * fuse_session;
+    struct fuse * fuse;
     int rc;
 
     // Checking the preconditions.
     assert(settings != NULL);
 
+    potato_initialize_structure(&potatofs, settings);
     syslog(LOG_NOTICE, k_log_potato_initializing);
-    struct fuse_args fuse_arguments = FUSE_ARGS_INIT(0, NULL);
-    rc = fuse_main(fuse_arguments.argc, fuse_arguments.argv, &potato_operations, NULL);
+    fuse = fuse_new(&fuse_arguments, &potato_operations, sizeof(struct fuse_operations), NULL);
+    if(fuse == NULL)
+        return POTATO_STATUS_FUSE_ALLOCATION;
+    fuse_session = fuse_get_session(fuse);
+    rc = fuse_set_signal_handlers(fuse_session);
+    if(rc != 0) {
+        fuse_destroy(fuse);
 
-    return rc;
+        return POTATO_STATUS_FUSE_SIGNAL_HANDLERS;
+    }
+    rc = fuse_mount(fuse, potatofs.mountpoint);
+    if(rc != 0) {
+        fuse_destroy(fuse);
+
+        return POTATO_STATUS_FUSE_MOUNT_FAILURE;
+    }
+    fcntl(fuse_session_fd(fuse_session), F_SETFD, FD_CLOEXEC);
+    rc = fuse_daemonize(potatofs.daemonize);
+    if(rc != 0) {
+        fuse_unmount(fuse);
+        fuse_destroy(fuse);
+
+        return POTATO_STATUS_FUSE_DAEMONIZATION_FAILED;
+    }
+    rc = fuse_loop_mt(fuse, 0);
+    if(rc != 0) {
+        fuse_unmount(fuse);
+        fuse_destroy(fuse);
+
+        return POTATO_STATUS_FUSE_MT_FAILURE;
+    }
+    // TODO Implement.
+    fuse_remove_signal_handlers(fuse_session);
+    fuse_unmount(fuse);
+    fuse_destroy(fuse);
+
+    return POTATO_STATUS_OK;
+}
+
+void potato_initialize_structure(struct potatofs * potatofs, const map_t * settings) {
+    // Checking the preconditions.
+    assert(potatofs != NULL && settings != NULL);
+
+    // Clear the structure.
+    memset(potatofs, 0, sizeof(struct potatofs));
 }
 
 int potato_open(const char * path, struct fuse_file_info * fi) {
     // TODO Implement.
 
-    return POTATO_STATUS_FAILURE;
+    return POTATO_STATUS_GENERIC_FAILURE;
 }
 
 int potato_read(const char * path, char * buf, size_t size, off_t offset, struct fuse_file_info * fi) {
     // TODO Implement.
 
-    return POTATO_STATUS_FAILURE;
+    return POTATO_STATUS_GENERIC_FAILURE;
 }
 
 int potato_readdir(const char * path, void * buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info * fi, enum fuse_readdir_flags flags) {
     // TODO Implement.
 
-    return POTATO_STATUS_FAILURE;
+    return POTATO_STATUS_GENERIC_FAILURE;
 }

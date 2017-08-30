@@ -43,9 +43,21 @@
 // END Includes. /////////////////////////////////////////////////////
 
 #define POTATO_STATUS_OK 0
-#define POTATO_STATUS_FAILURE -1
+#define POTATO_STATUS_GENERIC_FAILURE -1
+#define POTATO_STATUS_FUSE_ALLOCATION -2
+#define POTATO_STATUS_FUSE_SIGNAL_HANDLERS -3
+#define POTATO_STATUS_FUSE_MOUNT_FAILURE -4
+#define POTATO_STATUS_FUSE_DAEMONIZATION_FAILED -5
+#define POTATO_STATUS_FUSE_MT_FAILURE -6
+
+struct potatofs {
+    char * mountpoint;
+    bool daemonize;
+};
 
 int potato_initialize(const int argc, const char ** argv, const map_t * settings);
+
+void potato_initialize_structure(struct potatofs * potatofs, const map_t * settings);
 
 int potato_open(const char * path, struct fuse_file_info * fi);
 
