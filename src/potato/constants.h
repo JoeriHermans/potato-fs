@@ -24,11 +24,19 @@
 #define _H_CONSTANTS_
 
 // BEGIN Includes. ///////////////////////////////////////////////////
+
+// System dependencies.
+#include <stdlib.h>
+#include <stddef.h>
+
 // END Includes. /////////////////////////////////////////////////////
 
 extern const char k_usage[];
 
 extern const char k_newline;
+extern const char k_equal;
+extern const char k_trim_characters[];
+extern const size_t k_trim_num_characters;
 
 extern const char k_arg_config[];
 extern const char k_arg_config_s[];
@@ -43,5 +51,7 @@ extern const char k_log_parse_config[];
 extern const char k_log_stop_cause_error[];
 
 extern const char k_config_comment;
+extern const char k_config_blank_characters[];
+extern const size_t k_config_num_blank_characters;
 
 #endif

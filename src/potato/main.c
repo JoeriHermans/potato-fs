@@ -71,6 +71,7 @@ int run_mode_daemon(const int argc, const char ** argv) {
     } else {
         syslog(LOG_ERR, "No success :(");
     }
+    hashmap_map_keys(properties, &config_clear_properties);
     hashmap_free(properties);
 
     return EXIT_SUCCESS;

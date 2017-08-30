@@ -26,6 +26,7 @@
 #include <potato/constants.h>
 #include <potato/config_parser.h>
 #include <potato/ring_buffer.h>
+#include <potato/util.h>
 
 // System dependencies.
 #include <assert.h>
@@ -41,13 +42,18 @@
 
 // END Includes. /////////////////////////////////////////////////////
 
-bool config_parser_is_blank_line(const char * line_buffer) {
+bool config_parser_is_blank_line(const char * line_buffer, const size_t line_length) {
     // Checking the precondition.
     assert(line_buffer != NULL && strlen(line_buffer) > 0);
 
-    // TODO Implement.
+    for(size_t i = 0; i < line_length; ++i) {
+        if(line_buffer[i] == k_config_comment)
+            return true;
+        if(!in_character_set(line_buffer[i], k_config_blank_characters, k_config_num_blank_characters))
+            return false;
+    }
 
-    return false;
+    return true;
 }
 
 int config_parser_read(map_t * properties, const char * path) {
@@ -72,8 +78,12 @@ int config_parser_read(map_t * properties, const char * path) {
 }
 
 void config_parser_process_file(const int fd, ring_buffer_char_t * ring_buffer, map_t * properties) {
-    char line_buffer[BUFSIZ + 1];
     bool has_lines = true;
+    char key[BUFSIZ + 1];
+    char line_buffer[BUFSIZ + 1];
+    char value[BUFSIZ + 1];
+    int split_index;
+    size_t line_length;
 
     // Checking the precondition.
     assert(fd >= 0 && ring_buffer != NULL && properties != NULL);
@@ -84,9 +94,23 @@ void config_parser_process_file(const int fd, ring_buffer_char_t * ring_buffer, 
             has_lines = false;
             continue;
         }
-        config_parser_filter_line(line_buffer);
-        if(strlen(line_buffer) > 0) {
-            // TODO Implement.
+        line_length = strlen(line_buffer);
+        if(line_length > 0 && !config_parser_is_blank_line(line_buffer, line_length)) {
+            trim_a(line_buffer, &line_length);
+            split_index = character_index(line_buffer, k_equal);
+            // Check if a split index has been found.
+            if(split_index > 0) {
+                memcpy(key, line_buffer, split_index);
+                memcpy(value, &line_buffer[split_index + 1], line_length - split_index);
+                key[split_index] = '\0';
+                value[line_length - split_index] = '\0';
+                trim(key);
+                trim(value);
+                size_t value_length = strlen(value);
+                char * mvalue = (char *) calloc(value_length + 1, sizeof(char));
+                memcpy(mvalue, value, value_length);
+                hashmap_put(properties, key, (void *) mvalue);
+            }
         }
     }
 }
@@ -122,9 +146,9 @@ int config_parser_read_line(const int fd, ring_buffer_char_t * ring_buffer,
     return CONFIG_PARSER_STATUS_OK;
 }
 
-void config_parser_filter_line(char * line_buffer) {
-    // Checking the precondition.
-    assert(line_buffer != NULL && strlen(line_buffer) > 0);
+void config_clear_properties(map_t * properties, const char * key) {
+    char * value;
 
-    // TODO Implement.
+    hashmap_get(properties, key, (void **) &value);
+    free(value);
 }

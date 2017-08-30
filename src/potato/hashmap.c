@@ -227,6 +227,7 @@ void hashmap_free(map_t * map) {
     for(size_t i = 0; i < map->num_bins; ++i) {
         // Check if the current element is in use.
         if(map->bin[i].key) {
+            free(map->bin[i].key);
             // Check if there are multiple hash-collisions.
             element = map->bin[i].next_element;
             while(element) {
@@ -250,4 +251,21 @@ void hashmap_increase_max_bin_entries(map_t * map, const size_t max_bin_entries)
     assert(map != NULL && map->max_bin_entries <= max_bin_entries);
 
     map->max_bin_entries = max_bin_entries;
+}
+
+void hashmap_map_keys(map_t * map, void (*f)(map_t *, const char *)) {
+    struct hashmap_element * bin = map->bin;
+    struct hashmap_element * element;
+    size_t num_bins = map->num_bins;
+
+    for(size_t i = 0; i < num_bins; ++i) {
+        if(bin[i].key) {
+            element = &bin[i];
+            while(element) {
+                if(element->key)
+                    f(map, element->key);
+                element = element->next_element;
+            }
+        }
+    }
 }

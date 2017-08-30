@@ -23,6 +23,7 @@
 // BEGIN Includes. ///////////////////////////////////////////////////
 
 // Application dependencies.
+#include <potato/constants.h>
 #include <potato/util.h>
 
 // END Includes. /////////////////////////////////////////////////////
@@ -34,4 +35,86 @@ char * copy_string(const char * str) {
     if(p) strcpy(p, str);
 
     return p;
+}
+
+bool contains_character(const char * str, const size_t str_length, const char c) {
+    for(size_t i = 0; i < str_length; ++i) {
+        if(str[i] == c)
+            return true;
+    }
+
+    return false;
+}
+
+bool in_character_set(const char to_check, const char * set, const size_t set_size) {
+    for(size_t i = 0; i < set_size; ++i)
+        if(to_check == set[i])
+            return true;
+
+    return false;
+}
+
+void trim_a(char * str, size_t * str_length) {
+    // Trim start of the string.
+    for(size_t i = 0; i < *str_length; ++i) {
+        if(in_character_set(str[i], k_trim_characters, k_trim_num_characters)) {
+            string_shift_left(&str[i]);
+            --i;
+        } else {
+            break;
+        }
+    }
+    // Compute the new string length.
+    *str_length = strlen(str);
+    // Trim end of the string.
+    for(size_t i = (*str_length - 1); i >= 0 ; --i) {
+        if(in_character_set(str[i], k_trim_characters, k_trim_num_characters))
+            string_shift_left(&str[i]);
+        else
+            break;
+    }
+    // Compute the final string length after trimming.
+    *str_length = strlen(str);
+}
+
+void trim(char * str) {
+    size_t length;
+
+    length = strlen(str);
+    // Trim start of the string.
+    for(size_t i = 0; i < length; ++i) {
+        if(in_character_set(str[i], k_trim_characters, k_trim_num_characters)) {
+            string_shift_left(&str[i]);
+            --i;
+        } else {
+            break;
+        }
+    }
+    // Compute the new string length.
+    length = strlen(str);
+    // Trim end of the string.
+    for(size_t i = (length - 1); i >= 0 ; --i) {
+        if(in_character_set(str[i], k_trim_characters, k_trim_num_characters))
+            string_shift_left(&str[i]);
+        else
+            break;
+    }
+}
+
+void string_shift_left(char * str) {
+    while(*str) {
+        *str = *(str + 1);
+        ++str;
+    }
+}
+
+int character_index(const char * str, const char c) {
+    int index = 0;
+
+    while(str[index]) {
+        if(str[index] == c) return index;
+        ++index;
+    }
+
+    return -1;
 }

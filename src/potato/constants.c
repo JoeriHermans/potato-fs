@@ -25,6 +25,9 @@
 // Application dependencies.
 #include <potato/constants.h>
 
+// System dependencies.
+#include <string.h>
+
 // END Includes. /////////////////////////////////////////////////////
 
 const char k_usage[] = "PotatoFS 0.0.1\n"
@@ -35,6 +38,9 @@ const char k_usage[] = "PotatoFS 0.0.1\n"
                        "User:\n";
 
 const char k_newline = '\n';
+const char k_equal = '=';
+const char k_trim_characters[] = "\t\r\n ";
+const size_t k_trim_num_characters = strlen(k_trim_characters);
 
 const char k_arg_config[] = "--config";
 const char k_arg_config_s[] = "-c";
@@ -49,3 +55,5 @@ const char k_log_parse_config[] = "Parsing configuration file.";
 const char k_log_stop_cause_error[] = "Stopping PatotoFS due to error, please fix.";
 
 const char k_config_comment = '#';
+const char k_config_blank_characters[] = "\r\n\t# ";
+const size_t k_config_num_blank_characters = strlen(k_config_blank_characters);

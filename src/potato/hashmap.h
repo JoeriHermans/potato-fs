@@ -77,4 +77,6 @@ void hashmap_free_element(struct hashmap_element * element);
 
 void hashmap_increase_max_bin_entries(map_t * map, const size_t max_bin_entries);
 
+void hashmap_map_keys(map_t * map, void (*f)(map_t *, const char *));
+
 #endif

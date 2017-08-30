@@ -36,4 +36,16 @@
 
 char * copy_string(const char * str);
 
+bool contains_character(const char * str, const size_t str_length, const char c);
+
+bool in_character_set(const char to_check, const char * set, const size_t set_size);
+
+void trim_a(char * str, size_t * str_length);
+
+void trim(char * str);
+
+void string_shift_left(char * str);
+
+int character_index(const char * str, const char c);
+
 #endif
