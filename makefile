@@ -3,8 +3,8 @@ LD = g++
 
 SHELL = bash
 MODULES = ai application building controller d
-LDFLAGS = -lm -lz -lpthread -lc -o potato
-CCFLAGS = -I"src/" -c -Wall -std=c11 -D_FILE_OFFSET_BITS=64
+LDFLAGS = -lm -lz -lpthread -lc -l:libfuse3.so.3 -o potato
+CCFLAGS = -I"src/" -c -Wall -std=c11 -D_FILE_OFFSET_BITS=64 -I"/usr/include/fuse3/"
 
 SOURCEDIR = src/
 BUILDDIR = build/
