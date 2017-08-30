@@ -48,7 +48,7 @@
 
 // END Includes. /////////////////////////////////////////////////////
 
-struct fuse_operations potato_operations = {
+static struct fuse_operations potato_operations = {
     .open         = potato_open,
     .read         = potato_read,
     .readdir      = potato_readdir
@@ -61,7 +61,8 @@ int potato_initialize(const int argc, const char ** argv, const map_t * settings
     assert(settings != NULL);
 
     syslog(LOG_NOTICE, k_log_potato_initializing);
-    rc = fuse_main(argc, (char **) argv, &potato_operations, NULL);
+    struct fuse_args fuse_arguments = FUSE_ARGS_INIT(0, NULL);
+    rc = fuse_main(fuse_arguments.argc, fuse_arguments.argv, &potato_operations, NULL);
 
     return rc;
 }
@@ -78,7 +79,7 @@ int potato_read(const char * path, char * buf, size_t size, off_t offset, struct
     return POTATO_STATUS_FAILURE;
 }
 
-int potato_readdir(const char * path, void * buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info * fi) {
+int potato_readdir(const char * path, void * buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info * fi, enum fuse_readdir_flags flags) {
     // TODO Implement.
 
     return POTATO_STATUS_FAILURE;

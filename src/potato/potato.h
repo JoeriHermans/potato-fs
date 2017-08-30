@@ -27,6 +27,9 @@
 
 // BEGIN Includes. ///////////////////////////////////////////////////
 
+// FUSE Definition.
+#define FUSE_USE_VERSION 31
+
 // Application dependencies.
 #include <potato/hashmap.h>
 
@@ -42,14 +45,12 @@
 #define POTATO_STATUS_OK 0
 #define POTATO_STATUS_FAILURE -1
 
-extern struct fuse_operations potato_operations;
-
 int potato_initialize(const int argc, const char ** argv, const map_t * settings);
 
 int potato_open(const char * path, struct fuse_file_info * fi);
 
 int potato_read(const char * path, char * buf, size_t size, off_t offset, struct fuse_file_info * fi);
 
-int potato_readdir(const char * path, void * buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info * fi);
+int potato_readdir(const char *path, void * buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info * fi, enum fuse_readdir_flags flags);
 
 #endif
