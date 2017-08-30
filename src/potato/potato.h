@@ -55,7 +55,7 @@ struct potatofs {
     bool daemonize;
 };
 
-int potato_initialize(const int argc, const char ** argv, const map_t * settings);
+int potato_main(const int argc, const char ** argv, const map_t * settings);
 
 void potato_initialize_structure(struct potatofs * potatofs, const map_t * settings);
 

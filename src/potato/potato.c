@@ -54,7 +54,7 @@ static struct fuse_operations potato_operations = {
     .readdir      = potato_readdir
 };
 
-int potato_initialize(const int argc, const char ** argv, const map_t * settings) {
+int potato_main(const int argc, const char ** argv, const map_t * settings) {
     static char * program_argument[1];
     program_argument[0] = "potato";
     static struct fuse_args fuse_arguments = FUSE_ARGS_INIT(1, program_argument);
@@ -99,7 +99,6 @@ int potato_initialize(const int argc, const char ** argv, const map_t * settings
 
         return POTATO_STATUS_FUSE_MT_FAILURE;
     }
-    // TODO Implement.
     fuse_remove_signal_handlers(fuse_session);
     fuse_unmount(fuse);
     fuse_destroy(fuse);

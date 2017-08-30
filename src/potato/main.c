@@ -83,7 +83,7 @@ int run_mode_daemon(const int argc, const char ** argv) {
 
         return EXIT_FAILURE;
     }
-    rc = potato_initialize(argc, argv, properties);
+    rc = potato_main(argc, argv, properties);
     hashmap_map_keys(properties, &config_clear_properties);
     hashmap_free(properties);
 
