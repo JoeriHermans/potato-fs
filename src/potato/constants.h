@@ -48,6 +48,7 @@ extern const char k_log_initializing[];
 extern const char k_log_open_config[];
 extern const char k_log_open_config_error[];
 extern const char k_log_parse_config[];
+extern const char k_log_config_parsed[];
 extern const char k_log_stop_cause_error[];
 
 extern const char k_config_comment;

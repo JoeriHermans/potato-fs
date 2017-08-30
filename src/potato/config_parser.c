@@ -104,6 +104,14 @@ void config_parser_process_file(const int fd, ring_buffer_char_t * ring_buffer, 
                 memcpy(value, &line_buffer[split_index + 1], line_length - split_index);
                 key[split_index] = '\0';
                 value[line_length - split_index] = '\0';
+                split_index = character_index(value, k_config_comment);
+                if(split_index > 0) {
+                    // Remove trailing comment.
+                    memcpy(value, value, split_index);
+                    value[split_index] = '\0';
+                } else {
+                    continue;
+                }
                 trim(key);
                 trim(value);
                 size_t value_length = strlen(value);

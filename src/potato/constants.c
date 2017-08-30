@@ -51,6 +51,7 @@ const char k_log_close_config[] = "Closing configuration file.";
 const char k_log_initializing[] = "Initializing PotatoFS daemon.";
 const char k_log_open_config[] = "Opening configuration file at %s.";
 const char k_log_open_config_error[] = "Configuration file '%s' does not exist, or does not have the required read permissions.";
+const char k_log_config_parsed[] = "Succesfully parsed the configuration file.";
 const char k_log_parse_config[] = "Parsing configuration file.";
 const char k_log_stop_cause_error[] = "Stopping PatotoFS due to error, please fix.";
 

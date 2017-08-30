@@ -67,9 +67,14 @@ int run_mode_daemon(const int argc, const char ** argv) {
     properties = hashmap_new();
     rc = config_parser_read(properties, path_configuration);
     if(rc == 0) {
-        syslog(LOG_NOTICE, "Success!");
+        syslog(LOG_NOTICE, k_log_config_parsed);
     } else {
-        syslog(LOG_ERR, "No success :(");
+        syslog(LOG_ERR, k_log_open_config_error, path_configuration);
+        syslog(LOG_ERR, k_log_stop_cause_error);
+        hashmap_map_keys(properties, &config_clear_properties);
+        hashmap_free(properties);
+
+        return EXIT_FAILURE;
     }
     hashmap_map_keys(properties, &config_clear_properties);
     hashmap_free(properties);
