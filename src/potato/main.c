@@ -23,17 +23,18 @@
 // BEGIN Includes. ///////////////////////////////////////////////////
 
 // Application dependencies.
-#include <potato/main.h>
+#include <potato/config_parser.h>
 #include <potato/constants.h>
 #include <potato/hashmap.h>
+#include <potato/main.h>
+#include <potato/potato.h>
 #include <potato/ring_buffer.h>
-#include <potato/config_parser.h>
 
 // System dependencies.
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 #include <syslog.h>
 #include <unistd.h>
 
@@ -42,6 +43,12 @@
 int main(const int argc, const char ** argv) {
     int exit_code = EXIT_SUCCESS;
 
+    // Check if PotatoFS is being run as root.
+    if((getuid() == 0) || (geteuid() == 0)) {
+        syslog(LOG_ERR, k_log_no_root);
+
+        return EXIT_FAILURE;
+    }
     // Check if the initial program arguments are valid.
     if(valid_arguments(argc, argv)) {
         // Check if the program is running in Daemon or user mode.
@@ -61,7 +68,7 @@ int run_mode_daemon(const int argc, const char ** argv) {
     map_t * properties;
     int rc;
 
-    syslog(LOG_NOTICE, k_log_initializing);
+    syslog(LOG_NOTICE, k_log_initializing, FUSE_MAJOR_VERSION, FUSE_MINOR_VERSION);
     fetch_configuration_path(path_configuration, argc, argv);
     syslog(LOG_NOTICE, k_log_open_config, path_configuration);
     properties = hashmap_new();
@@ -76,10 +83,11 @@ int run_mode_daemon(const int argc, const char ** argv) {
 
         return EXIT_FAILURE;
     }
+    rc = potato_initialize(argc, argv, properties);
     hashmap_map_keys(properties, &config_clear_properties);
     hashmap_free(properties);
 
-    return EXIT_SUCCESS;
+    return rc;
 }
 
 int run_mode_user(const int argc, const char ** argv) {

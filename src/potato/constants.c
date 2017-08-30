@@ -48,12 +48,14 @@ const char k_arg_daemon[] = "--daemon";
 const char k_arg_daemon_s[] = "-d";
 
 const char k_log_close_config[] = "Closing configuration file.";
-const char k_log_initializing[] = "Initializing PotatoFS daemon.";
+const char k_log_initializing[] = "Initializing PotatoFS daemon with FUSE %d.%d.";
 const char k_log_open_config[] = "Opening configuration file at %s.";
 const char k_log_open_config_error[] = "Configuration file '%s' does not exist, or does not have the required read permissions.";
 const char k_log_config_parsed[] = "Succesfully parsed the configuration file.";
 const char k_log_parse_config[] = "Parsing configuration file.";
 const char k_log_stop_cause_error[] = "Stopping PatotoFS due to error, please fix.";
+const char k_log_potato_initializing[] = "Initializing the Potato filesystem.";
+const char k_log_no_root[] = "Cannot run PotatoFS as root due to security concerns.";
 
 const char k_config_comment = '#';
 const char k_config_blank_characters[] = "\r\n\t# ";

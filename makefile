@@ -4,7 +4,7 @@ LD = g++
 SHELL = bash
 MODULES = ai application building controller d
 LDFLAGS = -lm -lz -lpthread -lc -o potato
-CCFLAGS = -I"src/" -c -Wall -std=c11
+CCFLAGS = -I"src/" -c -Wall -std=c11 -D_FILE_OFFSET_BITS=64
 
 SOURCEDIR = src/
 BUILDDIR = build/
