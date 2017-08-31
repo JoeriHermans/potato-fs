@@ -58,6 +58,7 @@ extern const char k_log_no_root[];
 extern const char k_log_mountpoint_not_exists[];
 extern const char k_log_daemonizing[];
 extern const char k_log_mount_success[];
+extern const char k_log_stopping_potato[];
 
 extern const char k_config_comment;
 extern const char k_config_blank_characters[];
@@ -72,5 +73,6 @@ extern const char k_config_setting_to[];
 extern const char k_config_daemonize[];
 extern const char k_config_data_directory[];
 extern const char k_config_default_block_size[];
+extern const char k_config_max_peers[];
 
 #endif

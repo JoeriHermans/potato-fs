@@ -102,7 +102,6 @@ int potato_main(const int argc, const char ** argv, const map_t * settings) {
     }
     syslog(LOG_NOTICE, k_log_mount_success, potatofs.mountpoint);
     fcntl(fuse_session_fd(fuse_session), F_SETFD, FD_CLOEXEC);
-
     // Daemonize the FUSE session if required.
     if(potatofs.daemonize) {
         syslog(LOG_NOTICE, k_log_daemonizing);
@@ -126,6 +125,7 @@ int potato_main(const int argc, const char ** argv, const map_t * settings) {
     fuse_remove_signal_handlers(fuse_session);
     fuse_unmount(fuse);
     fuse_destroy(fuse);
+    syslog(LOG_NOTICE, k_log_stopping_potato);
 
     return POTATO_STATUS_OK;
 }

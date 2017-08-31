@@ -62,6 +62,7 @@ const char k_log_no_root[] = "Cannot run PotatoFS as root due to security concer
 const char k_log_mountpoint_not_exists[] = "The mountpoint (%s) does not exists or does not have the correct permissions.";
 const char k_log_daemonizing[] = "Daemonizing PotatoFS.";
 const char k_log_mount_success[] = "Mounted FUSE on %s succesfully.";
+const char k_log_stopping_potato[] = "Stopping PotatoFS, unmounted FUSE filesystem.";
 
 const char k_config_comment = '#';
 const char k_config_blank_characters[] = "\r\n\t# ";
@@ -76,3 +77,4 @@ const char k_config_setting_to[] = "Setting %s (%s).";
 const char k_config_daemonize[] = "daemonize";
 const char k_config_data_directory[] = "data_directory";
 const char k_config_default_block_size[] = "default_block_size";
+const char k_config_max_peers[] = "max_peers";
