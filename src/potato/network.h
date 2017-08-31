@@ -37,6 +37,8 @@
 
 // END Includes. /////////////////////////////////////////////////////
 
+int network_allocate_tcp_port(const uint16_t port);
+
 bool network_cork_disable(const int fd);
 
 bool network_cork_enable(const int fd);

@@ -38,6 +38,44 @@
 
 // END Includes. /////////////////////////////////////////////////////
 
+int network_allocate_tcp_port(const uint16_t port) {
+    static int yes = 1;
+    struct addrinfo hints;
+    struct addrinfo * server_info;
+    char string_port[6];
+    int result;
+    int rc;
+    int fd;
+
+    // Checking the precondition.
+    assert(port > 0);
+
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family    = AF_UNSPEC;
+    hints.ai_socktype  = SOCK_STREAM;
+    hints.ai_flags     = AI_PASSIVE;
+    sprintf(string_port, "%u", port);
+    rc = getaddrinfo(NULL, string_port, &hints, &server_info);
+    if(rc >= 0) {
+        fd = socket(server_info->ai_family, server_info->ai_socktype, server_info->ai_protocol);
+        if(fd >= 0) {
+            setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes);
+            if(bind(fd, server_info->ai_addr, server_info->ai_addrlen) == 0 && listen(fd, 64) == 0) {
+                result = fd;
+            } else {
+                close(fd);
+                result = -1;
+            }
+        } else {
+            result = -1;
+        }
+    } else {
+        result = -1;
+    }
+
+    return result;
+}
+
 bool network_cork_disable(const int fd) {
     static const int optval = 1;
     bool success;
