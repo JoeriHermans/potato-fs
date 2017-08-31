@@ -30,6 +30,13 @@
 // FUSE Definition.
 #define FUSE_USE_VERSION 31
 
+// POSIX Fixes.
+#ifndef S_IFMT
+#define S_IFMT __S_IFMT
+#define S_IFDIR __S_IFDIR
+#define S_IFREG __S_IFREG
+#endif
+
 // Application dependencies.
 #include <potato/hashmap.h>
 
@@ -56,8 +63,9 @@
 #define POTATO_STATUS_MOUNTPOINT_NOT_EXISTS -7
 
 struct potatofs {
-    char * mountpoint;
     bool daemonize;
+    char * data_directory;
+    char * mountpoint;
     unsigned int default_block_replication;
 };
 
@@ -70,6 +78,8 @@ void potato_init_struct_mountpoint(struct potatofs * potatofs, const map_t * set
 void potato_init_struct_default_block_replication(struct potatofs * potatofs, const map_t * settings);
 
 void potato_init_struct_daemonize(struct potatofs * potatofs, const map_t * settings);
+
+void potato_init_struct_data_directory(struct potatofs * potatofs, const map_t * settings);
 
 void  * potato_init(struct fuse_conn_info * conn, struct fuse_config * config);
 

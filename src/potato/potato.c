@@ -140,6 +140,7 @@ void potato_init_struct(struct potatofs * potatofs, const map_t * settings) {
     potato_init_struct_mountpoint(potatofs, settings);
     potato_init_struct_default_block_replication(potatofs, settings);
     potato_init_struct_daemonize(potatofs, settings);
+    potato_init_struct_data_directory(potatofs, settings);
 }
 
 void potato_init_struct_mountpoint(struct potatofs * potatofs, const map_t * settings) {
@@ -206,6 +207,19 @@ void potato_init_struct_daemonize(struct potatofs * potatofs, const map_t * sett
         syslog(LOG_NOTICE, k_config_default_value, k_config_daemonize, POTATO_SETTING_DEFAULT_DAEMONIZE);
         potatofs->daemonize = POTATO_SETTING_DEFAULT_DAEMONIZE;
     }
+}
+
+void potato_init_struct_data_directory(struct potatofs * potatofs, const map_t * settings) {
+    int rc;
+
+    // Checking the precondition.
+    assert(potatofs != NULL && settings != NULL);
+
+    rc = hashmap_get(settings, k_config_data_directory, (void **) &potatofs->data_directory);
+    if(rc == HASHMAP_STATUS_OK)
+        syslog(LOG_NOTICE, k_config_setting_to, k_config_data_directory, potatofs->data_directory);
+    else
+        syslog(LOG_ERR, k_config_not_found, k_config_data_directory);
 }
 
 void * potato_init(struct fuse_conn_info * conn, struct fuse_config * config) {

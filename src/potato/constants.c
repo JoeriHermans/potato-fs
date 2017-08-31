@@ -74,3 +74,4 @@ const char k_config_default_value[] = "Setting default value for %s (%s).";
 const char k_config_illegal_value[] = "Illegal value specified for %s (%s).";
 const char k_config_setting_to[] = "Setting %s (%s).";
 const char k_config_daemonize[] = "daemonize";
+const char k_config_data_directory[] = "data_directory";
