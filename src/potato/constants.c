@@ -42,6 +42,8 @@ const char k_equal = '=';
 const char k_trim_characters[] = "\t\r\n ";
 const size_t k_trim_num_characters = strlen(k_trim_characters);
 const char k_program_name[] = "potato";
+const char k_true[] = "true";
+const char k_false[] = "false";
 
 const char k_arg_config[] = "--config";
 const char k_arg_config_s[] = "-c";
@@ -57,6 +59,9 @@ const char k_log_parse_config[] = "Parsing configuration file.";
 const char k_log_stop_cause_error[] = "Stopping PatotoFS due to error, please fix.";
 const char k_log_potato_initializing[] = "Initializing the Potato filesystem.";
 const char k_log_no_root[] = "Cannot run PotatoFS as root due to security concerns.";
+const char k_log_mountpoint_not_exists[] = "The mountpoint (%s) does not exists or does not have the correct permissions.";
+const char k_log_daemonizing[] = "Daemonizing PotatoFS.";
+const char k_log_mount_success[] = "Mounted FUSE on %s succesfully.";
 
 const char k_config_comment = '#';
 const char k_config_blank_characters[] = "\r\n\t# ";
@@ -68,3 +73,4 @@ const char k_config_default_value_int[] = "Setting default value for %s (%d).";
 const char k_config_default_value[] = "Setting default value for %s (%s).";
 const char k_config_illegal_value[] = "Illegal value specified for %s (%s).";
 const char k_config_setting_to[] = "Setting %s (%s).";
+const char k_config_daemonize[] = "daemonize";

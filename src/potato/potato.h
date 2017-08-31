@@ -34,6 +34,7 @@
 #include <potato/hashmap.h>
 
 // System dependencies.
+#include <sys/stat.h>
 #include <fuse.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -43,6 +44,7 @@
 // END Includes. /////////////////////////////////////////////////////
 
 #define POTATO_SETTING_DEFAULT_BLOCK_REPLICATION 3
+#define POTATO_SETTING_DEFAULT_DAEMONIZE true
 
 #define POTATO_STATUS_OK 0
 #define POTATO_STATUS_GENERIC_FAILURE -1
@@ -67,10 +69,16 @@ void potato_init_struct_mountpoint(struct potatofs * potatofs, const map_t * set
 
 void potato_init_struct_default_block_replication(struct potatofs * potatofs, const map_t * settings);
 
+void potato_init_struct_daemonize(struct potatofs * potatofs, const map_t * settings);
+
+void  * potato_init(struct fuse_conn_info * conn, struct fuse_config * config);
+
 int potato_open(const char * path, struct fuse_file_info * fi);
 
 int potato_read(const char * path, char * buf, size_t size, off_t offset, struct fuse_file_info * fi);
 
 int potato_readdir(const char *path, void * buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info * fi, enum fuse_readdir_flags flags);
+
+int potato_getattr(const char * path, struct stat * stbuf, struct fuse_file_info * fi);
 
 #endif
