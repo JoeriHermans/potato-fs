@@ -141,6 +141,7 @@ void potato_init_struct(struct potatofs * potatofs, const map_t * settings) {
     potato_init_struct_default_block_replication(potatofs, settings);
     potato_init_struct_daemonize(potatofs, settings);
     potato_init_struct_data_directory(potatofs, settings);
+    potato_init_struct_default_block_size(potatofs, settings);
 }
 
 void potato_init_struct_mountpoint(struct potatofs * potatofs, const map_t * settings) {
@@ -166,13 +167,13 @@ void potato_init_struct_default_block_replication(struct potatofs * potatofs, co
 
     rc = hashmap_get(settings, k_config_default_block_replication, (void **) &value);
     if(rc == HASHMAP_STATUS_NOT_FOUND) {
-        syslog(LOG_NOTICE, k_config_not_found, k_config_default_block_replication);
+        syslog(LOG_ERR, k_config_not_found, k_config_default_block_replication);
         syslog(LOG_NOTICE, k_config_default_value_int, k_config_default_block_replication, POTATO_SETTING_DEFAULT_BLOCK_REPLICATION);
         potatofs->default_block_replication = POTATO_SETTING_DEFAULT_BLOCK_REPLICATION;
     } else {
         // Check if the specified value is an unsigned integer.
         if(is_unsigned_integer(value)) {
-            potatofs->default_block_replication = strtoul(value, NULL, 0);
+            potatofs->default_block_replication = (size_t) strtoul(value, NULL, 0);
             syslog(LOG_NOTICE, k_config_setting_to, k_config_default_block_replication, value);
         } else {
             syslog(LOG_ERR, k_config_illegal_value, k_config_default_block_replication, value);
@@ -220,6 +221,31 @@ void potato_init_struct_data_directory(struct potatofs * potatofs, const map_t *
         syslog(LOG_NOTICE, k_config_setting_to, k_config_data_directory, potatofs->data_directory);
     else
         syslog(LOG_ERR, k_config_not_found, k_config_data_directory);
+}
+
+void potato_init_struct_default_block_size(struct potatofs * potatofs, const map_t * settings) {
+    char * value;
+    int rc;
+
+    // Checking the precondition.
+    assert(potatofs != NULL && settings != NULL);
+
+    rc = hashmap_get(settings, k_config_default_block_size, (void **) &value);
+    if(rc == HASHMAP_STATUS_NOT_FOUND) {
+        syslog(LOG_ERR, k_config_not_found, k_config_default_block_size);
+        syslog(LOG_NOTICE, k_config_default_value_int, k_config_default_block_size, POTATO_SETTING_DEFAULT_BLOCK_SIZE);
+        potatofs->default_block_size = POTATO_SETTING_DEFAULT_BLOCK_SIZE;
+    } else {
+        // Check if the specified value is an unsigned integer.
+        if(is_unsigned_integer(value)) {
+            potatofs->default_block_size = (size_t) strtoul(value, NULL, 0);
+            syslog(LOG_NOTICE, k_config_setting_to, k_config_default_block_size, value);
+        } else {
+            syslog(LOG_ERR, k_config_illegal_value, k_config_default_block_size, value);
+            syslog(LOG_NOTICE, k_config_default_value_int, k_config_default_block_size, POTATO_SETTING_DEFAULT_BLOCK_SIZE);
+            potatofs->default_block_size = POTATO_SETTING_DEFAULT_BLOCK_SIZE;
+        }
+    }
 }
 
 void * potato_init(struct fuse_conn_info * conn, struct fuse_config * config) {

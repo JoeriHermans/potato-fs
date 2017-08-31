@@ -71,5 +71,6 @@ extern const char k_config_illegal_value[];
 extern const char k_config_setting_to[];
 extern const char k_config_daemonize[];
 extern const char k_config_data_directory[];
+extern const char k_config_default_block_size[];
 
 #endif

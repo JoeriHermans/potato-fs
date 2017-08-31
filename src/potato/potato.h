@@ -52,6 +52,7 @@
 
 #define POTATO_SETTING_DEFAULT_BLOCK_REPLICATION 3
 #define POTATO_SETTING_DEFAULT_DAEMONIZE true
+#define POTATO_SETTING_DEFAULT_BLOCK_SIZE 1000000
 
 #define POTATO_STATUS_OK 0
 #define POTATO_STATUS_GENERIC_FAILURE -1
@@ -66,7 +67,8 @@ struct potatofs {
     bool daemonize;
     char * data_directory;
     char * mountpoint;
-    unsigned int default_block_replication;
+    size_t default_block_replication;
+    size_t default_block_size;
 };
 
 int potato_main(const int argc, const char ** argv, const map_t * settings);
@@ -80,6 +82,8 @@ void potato_init_struct_default_block_replication(struct potatofs * potatofs, co
 void potato_init_struct_daemonize(struct potatofs * potatofs, const map_t * settings);
 
 void potato_init_struct_data_directory(struct potatofs * potatofs, const map_t * settings);
+
+void potato_init_struct_default_block_size(struct potatofs * potatofs, const map_t * settings);
 
 void  * potato_init(struct fuse_conn_info * conn, struct fuse_config * config);
 
