@@ -57,5 +57,12 @@ extern const char k_log_no_root[];
 extern const char k_config_comment;
 extern const char k_config_blank_characters[];
 extern const size_t k_config_num_blank_characters;
+extern const char k_config_mountpoint[];
+extern const char k_config_not_found[];
+extern const char k_config_default_block_replication[];
+extern const char k_config_default_value[];
+extern const char k_config_default_value_int[];
+extern const char k_config_illegal_value[];
+extern const char k_config_setting_to[];
 
 #endif

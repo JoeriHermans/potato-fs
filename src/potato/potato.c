@@ -66,11 +66,13 @@ int potato_main(const int argc, const char ** argv, const map_t * settings) {
     // Checking the preconditions.
     assert(settings != NULL);
 
-    potato_initialize_structure(&potatofs, settings);
+    potato_init_struct(&potatofs, settings);
+
     syslog(LOG_NOTICE, k_log_potato_initializing);
     fuse = fuse_new(&fuse_arguments, &potato_operations, sizeof(struct fuse_operations), NULL);
     if(fuse == NULL)
         return POTATO_STATUS_FUSE_ALLOCATION;
+
     fuse_session = fuse_get_session(fuse);
     rc = fuse_set_signal_handlers(fuse_session);
     if(rc != 0) {
@@ -78,13 +80,16 @@ int potato_main(const int argc, const char ** argv, const map_t * settings) {
 
         return POTATO_STATUS_FUSE_SIGNAL_HANDLERS;
     }
+
     rc = fuse_mount(fuse, potatofs.mountpoint);
     if(rc != 0) {
         fuse_destroy(fuse);
 
         return POTATO_STATUS_FUSE_MOUNT_FAILURE;
     }
+
     fcntl(fuse_session_fd(fuse_session), F_SETFD, FD_CLOEXEC);
+
     rc = fuse_daemonize(potatofs.daemonize);
     if(rc != 0) {
         fuse_unmount(fuse);
@@ -92,6 +97,7 @@ int potato_main(const int argc, const char ** argv, const map_t * settings) {
 
         return POTATO_STATUS_FUSE_DAEMONIZATION_FAILED;
     }
+
     rc = fuse_loop_mt(fuse, 0);
     if(rc != 0) {
         fuse_unmount(fuse);
@@ -99,19 +105,64 @@ int potato_main(const int argc, const char ** argv, const map_t * settings) {
 
         return POTATO_STATUS_FUSE_MT_FAILURE;
     }
+
     fuse_remove_signal_handlers(fuse_session);
+
     fuse_unmount(fuse);
+
     fuse_destroy(fuse);
 
     return POTATO_STATUS_OK;
 }
 
-void potato_initialize_structure(struct potatofs * potatofs, const map_t * settings) {
+void potato_init_struct(struct potatofs * potatofs, const map_t * settings) {
     // Checking the preconditions.
     assert(potatofs != NULL && settings != NULL);
 
     // Clear the structure.
     memset(potatofs, 0, sizeof(struct potatofs));
+    // Fetch the parameters from the hashmap.
+    potato_init_struct_mountpoint(potatofs, settings);
+    potato_init_struct_default_block_replication(potatofs, settings);
+}
+
+void potato_init_struct_mountpoint(struct potatofs * potatofs, const map_t * settings) {
+    int rc;
+
+    // Checking the precondition.
+    assert(potatofs != NULL && settings != NULL);
+
+    rc = hashmap_get(settings, k_config_mountpoint, (void **) &potatofs->mountpoint);
+    if(rc == HASHMAP_STATUS_NOT_FOUND) {
+        syslog(LOG_ERR, k_config_not_found, k_config_mountpoint);
+    } else {
+        syslog(LOG_NOTICE, k_config_setting_to, k_config_mountpoint, potatofs->mountpoint);
+    }
+}
+
+void potato_init_struct_default_block_replication(struct potatofs * potatofs, const map_t * settings) {
+    char * value;
+    int rc;
+
+    // Checking the precondition.
+    assert(potatofs != NULL && settings != NULL);
+
+    rc = hashmap_get(settings, k_config_default_block_replication, (void **) &value);
+    if(rc == HASHMAP_STATUS_NOT_FOUND) {
+        syslog(LOG_NOTICE, k_config_not_found, k_config_default_block_replication);
+        syslog(LOG_NOTICE, k_config_default_value_int, k_config_default_block_replication, POTATO_SETTING_DEFAULT_BLOCK_REPLICATION);
+        potatofs->default_block_replication = POTATO_SETTING_DEFAULT_BLOCK_REPLICATION;
+    } else {
+        // Check if the specified value is an unsigned integer.
+        if(is_unsigned_integer(value)) {
+            potatofs->default_block_replication = strtoul(value, NULL, 0);
+            syslog(LOG_NOTICE, k_config_setting_to, k_config_default_block_replication, value);
+        } else {
+            syslog(LOG_ERR, k_config_illegal_value, k_config_default_block_replication, value);
+            syslog(LOG_NOTICE, k_config_default_value_int, k_config_default_block_replication, POTATO_SETTING_DEFAULT_BLOCK_REPLICATION);
+            potatofs->default_block_replication = POTATO_SETTING_DEFAULT_BLOCK_REPLICATION;
+        }
+    }
 }
 
 int potato_open(const char * path, struct fuse_file_info * fi) {

@@ -118,3 +118,15 @@ int character_index(const char * str, const char c) {
 
     return -1;
 }
+
+bool is_unsigned_integer(const char * str) {
+    const char * c = str;
+
+    while(*c) {
+        if(*c < '0' || *c > '9')
+            return false;
+        ++c;
+    }
+
+    return true;
+}

@@ -48,4 +48,6 @@ void string_shift_left(char * str);
 
 int character_index(const char * str, const char c);
 
+bool is_unsigned_integer(const char * str);
+
 #endif

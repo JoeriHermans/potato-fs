@@ -109,8 +109,6 @@ void config_parser_process_file(const int fd, ring_buffer_char_t * ring_buffer, 
                     // Remove trailing comment.
                     memcpy(value, value, split_index);
                     value[split_index] = '\0';
-                } else {
-                    continue;
                 }
                 trim(key);
                 trim(value);

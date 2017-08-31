@@ -42,6 +42,8 @@
 
 // END Includes. /////////////////////////////////////////////////////
 
+#define POTATO_SETTING_DEFAULT_BLOCK_REPLICATION 3
+
 #define POTATO_STATUS_OK 0
 #define POTATO_STATUS_GENERIC_FAILURE -1
 #define POTATO_STATUS_FUSE_ALLOCATION -2
@@ -49,15 +51,21 @@
 #define POTATO_STATUS_FUSE_MOUNT_FAILURE -4
 #define POTATO_STATUS_FUSE_DAEMONIZATION_FAILED -5
 #define POTATO_STATUS_FUSE_MT_FAILURE -6
+#define POTATO_STATUS_MOUNTPOINT_NOT_EXISTS -7
 
 struct potatofs {
     char * mountpoint;
     bool daemonize;
+    unsigned int default_block_replication;
 };
 
 int potato_main(const int argc, const char ** argv, const map_t * settings);
 
-void potato_initialize_structure(struct potatofs * potatofs, const map_t * settings);
+void potato_init_struct(struct potatofs * potatofs, const map_t * settings);
+
+void potato_init_struct_mountpoint(struct potatofs * potatofs, const map_t * settings);
+
+void potato_init_struct_default_block_replication(struct potatofs * potatofs, const map_t * settings);
 
 int potato_open(const char * path, struct fuse_file_info * fi);
 

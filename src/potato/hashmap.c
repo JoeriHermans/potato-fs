@@ -63,19 +63,24 @@ int hashmap_get(const map_t * map, const char * key, void ** buffer) {
 
     index = hashmap_hash(map, key);
     element = &map->bin[index];
-    if(strcmp(element->key, key) == 0) {
-        status = HASHMAP_STATUS_OK;
-        *buffer = element->data;
-    } else {
-        status = HASHMAP_STATUS_NOT_FOUND;
-        element = element->next_element;
-        while(element) {
-            if(strcmp(element->key, key) == 0) {
-                status = HASHMAP_STATUS_OK;
-                *buffer = element->data;
-                break;
+    if(element->key) {
+        if(strcmp(element->key, key) == 0) {
+            status = HASHMAP_STATUS_OK;
+            *buffer = element->data;
+        } else {
+            status = HASHMAP_STATUS_NOT_FOUND;
+            element = element->next_element;
+            while(element) {
+                if(strcmp(element->key, key) == 0) {
+                    status = HASHMAP_STATUS_OK;
+                    *buffer = element->data;
+                    break;
+                }
             }
         }
+    } else {
+        status = HASHMAP_STATUS_NOT_FOUND;
+        *buffer = NULL;
     }
 
     return status;
