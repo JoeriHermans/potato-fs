@@ -30,13 +30,6 @@
 // FUSE Definition.
 #define FUSE_USE_VERSION 31
 
-// POSIX Fixes.
-#ifndef S_IFMT
-#define S_IFMT __S_IFMT
-#define S_IFDIR __S_IFDIR
-#define S_IFREG __S_IFREG
-#endif
-
 // Application dependencies.
 #include <potato/hashmap.h>
 
