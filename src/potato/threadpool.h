@@ -35,6 +35,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 // END Includes. /////////////////////////////////////////////////////
@@ -48,17 +49,27 @@ typedef struct _threadpool_task {
     void * method;
     void * argument;
     void * result;
+    bool ready;
 } threadpool_task_t;
 
 // Ringbuffer definitions for our threadpool.
-ring_buffer_define(threadpool_task_t, ring_buffer_threadpool_task_t);
+ring_buffer_define(threadpool_task_t *, ring_buffer_threadpool_task_t);
 
 typedef struct _threadpool {
-    size_t max_tasks;
-    size_t num_threads;
-    ring_buffer_threadpool_task_t task_buffer;
+    bool * active_threads;
     pthread_mutex_t mutex_task_buffer;
+    pthread_mutex_t mutex_threads;
+    pthread_t * threads;
+    ring_buffer_threadpool_task_t task_buffer;
+    size_t max_tasks;
+    size_t num_active_threads;
+    size_t num_sleeping_threads;
+    size_t num_threads;
 } threadpool_t;
+
+bool threadpool_queue_full(threadpool_t * threadpool);
+
+int threadpool_enqueue(threadpool_t * threadpool, const threadpool_task_t * task);
 
 threadpool_t * threadpool_new(const size_t max_tasks, const size_t num_threads);
 

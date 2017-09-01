@@ -33,6 +33,32 @@
 
 // END Includes. /////////////////////////////////////////////////////
 
+bool threadpool_queue_full(threadpool_t * threadpool) {
+    bool success;
+
+    pthread_mutex_lock(&threadpool->mutex_task_buffer);
+    success = ring_buffer_is_full(&threadpool->task_buffer);
+    pthread_mutex_unlock(&threadpool->mutex_task_buffer);
+
+    return success;
+}
+
+int threadpool_enqueue(threadpool_t * threadpool, const threadpool_task_t * task) {
+    int result;
+
+    // Check if the task queueu is full.
+    pthread_mutex_lock(&threadpool->mutex_task_buffer);
+    if(!ring_buffer_is_full(&threadpool->task_buffer)) {
+        result = THREADPOOL_STATUS_OK;
+        // TODO Implement.
+    } else {
+        result = THREADPOOL_STATUS_QUEUE_FULL;
+    }
+    pthread_mutex_unlock(&threadpool->mutex_task_buffer);
+
+    return result;
+}
+
 threadpool_t * threadpool_new(const size_t max_tasks, const size_t num_threads) {
     threadpool_t * threadpool;
 
@@ -43,8 +69,11 @@ threadpool_t * threadpool_new(const size_t max_tasks, const size_t num_threads) 
     memset(threadpool, 0, sizeof(threadpool_t));
     threadpool->max_tasks = max_tasks;
     threadpool->num_threads = num_threads;
-    ring_buffer_initialize(&threadpool->task_buffer, max_tasks, threadpool_task_t);
+    ring_buffer_initialize(&threadpool->task_buffer, max_tasks, threadpool_task_t *);
     pthread_mutex_init(&threadpool->mutex_task_buffer, NULL);
+    pthread_mutex_init(&threadpool->mutex_threads, NULL);
+    threadpool->threads = (pthread_t *) calloc(num_threads, sizeof(pthread_t));
+    threadpool->active_threads = (bool *) calloc(num_threads, sizeof(bool));
 
     return threadpool;
 }
@@ -60,7 +89,10 @@ void threadpool_free(threadpool_t * threadpool) {
     assert(threadpool != NULL);
 
     pthread_mutex_destroy(&threadpool->mutex_task_buffer);
+    pthread_mutex_destroy(&threadpool->mutex_threads);
     ring_buffer = &threadpool->task_buffer;
     ring_buffer_destroy(ring_buffer);
+    free(threadpool->threads);
+    free(threadpool->active_threads);
     free(threadpool);
 }
