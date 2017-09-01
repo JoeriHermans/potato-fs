@@ -142,6 +142,7 @@ void potato_init_struct(struct potatofs * potatofs, const map_t * settings) {
     potato_init_struct_daemonize(potatofs, settings);
     potato_init_struct_data_directory(potatofs, settings);
     potato_init_struct_default_block_size(potatofs, settings);
+    potato_init_struct_block_sharing(potatofs, settings);
 }
 
 void potato_init_struct_mountpoint(struct potatofs * potatofs, const map_t * settings) {
@@ -245,6 +246,33 @@ void potato_init_struct_default_block_size(struct potatofs * potatofs, const map
             syslog(LOG_NOTICE, k_config_default_value_int, k_config_default_block_size, POTATO_SETTING_DEFAULT_BLOCK_SIZE);
             potatofs->default_block_size = POTATO_SETTING_DEFAULT_BLOCK_SIZE;
         }
+    }
+}
+
+void potato_init_struct_block_sharing(struct potatofs * potatofs, const map_t * settings) {
+    const char * flag_value;
+    char * value;
+    bool flag;
+    int rc;
+
+    // Checking the precondition.
+    assert(potatofs != NULL && settings != NULL);
+
+    rc = hashmap_get(settings, k_config_block_sharing, (void **) &value);
+    if(rc == HASHMAP_STATUS_OK) {
+        // Check if the specified value is valid.
+        if(strcmp(value, k_true) == 0) {
+            flag = true;
+            flag_value = k_true;
+        } else {
+            flag = false;
+            flag_value = k_false;
+        }
+        syslog(LOG_NOTICE, k_config_setting_to, k_config_block_sharing, flag_value);
+        potatofs->block_sharing = flag;
+    } else {
+        syslog(LOG_NOTICE, k_config_default_value, k_config_block_sharing, POTATO_SETTING_DEFAULT_BLOCK_SHARING);
+        potatofs->daemonize = POTATO_SETTING_DEFAULT_BLOCK_SHARING;
     }
 }
 
