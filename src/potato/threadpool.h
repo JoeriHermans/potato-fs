@@ -45,7 +45,9 @@
 #define THREADPOOL_STATUS_QUEUE_FULL -1
 
 typedef struct _threadpool_task {
-    // TODO Implement.
+    void * method;
+    void * argument;
+    void * result;
 } threadpool_task_t;
 
 // Ringbuffer definitions for our threadpool.
@@ -54,7 +56,14 @@ ring_buffer_define(threadpool_task_t, ring_buffer_threadpool_task_t);
 typedef struct _threadpool {
     size_t max_tasks;
     size_t num_threads;
-    // TODO Implement.
+    ring_buffer_threadpool_task_t task_buffer;
+    pthread_mutex_t mutex_task_buffer;
 } threadpool_t;
+
+threadpool_t * threadpool_new(const size_t max_tasks, const size_t num_threads);
+
+threadpool_t * threadpool_new_default(void);
+
+void threadpool_free(threadpool_t * threadpool);
 
 #endif
