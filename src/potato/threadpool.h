@@ -63,13 +63,15 @@ typedef struct _threadpool {
     ring_buffer_threadpool_task_t task_buffer;
     size_t max_tasks;
     size_t num_active_threads;
-    size_t num_sleeping_threads;
+    size_t num_inactive_threads;
     size_t num_threads;
 } threadpool_t;
 
 bool threadpool_queue_full(threadpool_t * threadpool);
 
-int threadpool_enqueue(threadpool_t * threadpool, const threadpool_task_t * task);
+bool threadpool_has_inactive_threads(const threadpool_t * threadpool);
+
+int threadpool_enqueue(threadpool_t * threadpool, threadpool_task_t * task);
 
 threadpool_t * threadpool_new(const size_t max_tasks, const size_t num_threads);
 

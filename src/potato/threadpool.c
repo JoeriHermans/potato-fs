@@ -43,18 +43,23 @@ bool threadpool_queue_full(threadpool_t * threadpool) {
     return success;
 }
 
-int threadpool_enqueue(threadpool_t * threadpool, const threadpool_task_t * task) {
+bool threadpool_has_inactive_threads(const threadpool_t * threadpool) {
+    return threadpool->num_inactive_threads > 0;
+}
+
+int threadpool_enqueue(threadpool_t * threadpool, threadpool_task_t * task) {
     int result;
 
     // Check if the task queueu is full.
     pthread_mutex_lock(&threadpool->mutex_task_buffer);
     if(!ring_buffer_is_full(&threadpool->task_buffer)) {
         result = THREADPOOL_STATUS_OK;
-        // TODO Implement.
+        ring_buffer_insert(&threadpool->task_buffer, task);
     } else {
         result = THREADPOOL_STATUS_QUEUE_FULL;
     }
     pthread_mutex_unlock(&threadpool->mutex_task_buffer);
+    // TODO Check if a thread needs to be woken up.
 
     return result;
 }
