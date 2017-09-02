@@ -56,6 +56,16 @@ bool hashmap_exists(const map_t * map, const char * key) {
     return found;
 }
 
+double hashmap_efficiency(const map_t * hashmap) {
+    double efficiency;
+    size_t num_entries;
+    size_t num_bins;
+
+    // TODO Implement.
+
+    return efficiency;
+}
+
 int hashmap_get(const map_t * map, const char * key, void ** buffer) {
     struct hashmap_element * element;
     int status;
@@ -176,6 +186,28 @@ int hashmap_remove(map_t * map, const char * key) {
 
 size_t hashmap_size(const map_t * map) {
     return map->num_entries;
+}
+
+size_t hashmap_num_free_bins(const map_t * map) {
+    size_t num_bins = map->num_bins;
+    size_t free_bins = 0;
+
+    for(size_t i = 0; i < num_bins; ++i)
+        if(!map->bin[i].key)
+            ++free_bins;
+
+    return free_bins;
+}
+
+size_t hashmap_num_occupied_bins(const map_t * map) {
+    size_t num_bins = map->num_bins;
+    size_t occupied_bins;
+
+    for(size_t i = 0; i < num_bins; ++i)
+        if(map->bin[i].key)
+            ++occupied_bins;
+
+    return occupied_bins;
 }
 
 map_t * hashmap_new(void) {
