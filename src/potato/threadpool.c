@@ -115,6 +115,15 @@ threadpool_t * threadpool_new(const size_t max_tasks, const size_t num_threads) 
     memset(threadpool->mutex_cond_threads, 0, num_threads * sizeof(pthread_mutex_t));
     threadpool->condition_threads = (pthread_cond_t *) calloc(num_threads, sizeof(pthread_cond_t));
     memset(threadpool->condition_threads, 0, num_threads * sizeof(pthread_cond_t));
+    threadpool->num_inactive_threads = num_threads;
+    for(size_t i = 0; i < num_threads; ++i) {
+        struct _threadpool_thread_main_args * args;
+
+        args = (struct _threadpool_thread_main_args *) malloc(sizeof(struct _threadpool_thread_main_args));
+        args->threadpool = threadpool;
+        args->thread_index = (unsigned int) i;
+        pthread_create(&threadpool->threads[i], NULL, &threadpool_thread_main, (void *) args);
+    }
 
     return threadpool;
 }
@@ -144,15 +153,14 @@ void threadpool_free(threadpool_t * threadpool) {
     ring_buffer_threadpool_task_t * ring_buffer;
 
     // Checking the precondition.
-    assert(threadpool != NULL);
+    assert(threadpool != NULL && threadpool->running == false);
 
-    // TODO Add thread stopping.
     free(threadpool->mutex_cond_threads);
     free(threadpool->condition_threads);
     pthread_mutex_destroy(&threadpool->mutex_task_buffer);
     pthread_mutex_destroy(&threadpool->mutex_threads);
     ring_buffer = &threadpool->task_buffer;
-    ring_buffer_destroy(ring_buffer);
+    ring_buffer_free_internals(ring_buffer);
     free(threadpool->threads);
     free(threadpool->active_threads);
     free(threadpool);
@@ -160,9 +168,13 @@ void threadpool_free(threadpool_t * threadpool) {
 
 void threadpool_stop(threadpool_t * threadpool) {
     threadpool->running = false;
+    threadpool_wakeup_all(threadpool);
 }
 
-void threadpool_thread_main(threadpool_t * threadpool, const unsigned int thread_index) {
+void * threadpool_thread_main(void * argument) {
+    struct _threadpool_thread_main_args * args = (struct _threadpool_thread_main_args *) argument;
+    threadpool_t * threadpool = args->threadpool;
+    unsigned int thread_index = args->thread_index;
     pthread_mutex_t * lock = &threadpool->mutex_cond_threads[thread_index];
     pthread_cond_t * condition = &threadpool->condition_threads[thread_index];
     threadpool_task_t * task;
@@ -175,18 +187,18 @@ void threadpool_thread_main(threadpool_t * threadpool, const unsigned int thread
     pthread_mutex_lock(lock);
     // Run until the threadpool has to run.
     while(threadpool_running(threadpool)) {
-        // Check if there are tasks left to be processed.
-        if(threadpool_queue_empty(threadpool)) {
-            threadpool_decrease_active_threads(threadpool, thread_index);
-            pthread_cond_wait(condition, lock);
-            threadpool_increase_active_threads(threadpool, thread_index);
-        }
         // Fetch the next task from the task buffer.
         task = threadpool_dequeue(threadpool);
         if(task) {
             // TODO Implement running task.
             printf("Running task from thread %u.\n", thread_index);
             task->ready = true;
+        }
+        // Check if there are tasks left to be processed.
+        if(threadpool_queue_empty(threadpool)) {
+            threadpool_decrease_active_threads(threadpool, thread_index);
+            pthread_cond_wait(condition, lock);
+            threadpool_increase_active_threads(threadpool, thread_index);
         }
     }
     // Edn the thread task.
@@ -195,6 +207,10 @@ void threadpool_thread_main(threadpool_t * threadpool, const unsigned int thread
     // Free the allocated mutex and condition variable.
     pthread_cond_destroy(condition);
     pthread_mutex_destroy(lock);
+    // Free the allocated arguments structure.
+    free(args);
+
+    return NULL;
 }
 
 void threadpool_thread_wakeup(threadpool_t * threadpool, const unsigned int thread_index) {
@@ -206,6 +222,16 @@ void threadpool_thread_wakeup(threadpool_t * threadpool, const unsigned int thre
     pthread_mutex_lock(lock);
     pthread_cond_signal(condition);
     pthread_mutex_unlock(lock);
+}
+
+void threadpool_wakeup_all(threadpool_t * threadpool) {
+    size_t num_threads;
+
+    num_threads = threadpool->num_threads;
+    pthread_mutex_lock(&threadpool->mutex_threads);
+    for(size_t i = 0; i < num_threads; ++i)
+        threadpool_thread_wakeup(threadpool, (unsigned int) i);
+    pthread_mutex_unlock(&threadpool->mutex_threads);
 }
 
 void threadpool_wakeup(threadpool_t * threadpool) {
@@ -238,4 +264,20 @@ void threadpool_decrease_active_threads(threadpool_t * threadpool, const unsigne
     --threadpool->num_active_threads;
     ++threadpool->num_inactive_threads;
     pthread_mutex_unlock(&threadpool->mutex_threads);
+}
+
+void threadpool_join(threadpool_t * threadpool) {
+    size_t num_threads;
+
+    // Checking the precondition.
+    assert(threadpool->running == false);
+
+    num_threads = threadpool->num_threads;
+    // Join all threads.
+    for(size_t i = 0; i < num_threads; ++i)
+        pthread_join(threadpool->threads[i], NULL);
+    // Reset all threadpool statistics.
+    threadpool->num_active_threads = 0;
+    threadpool->num_inactive_threads = threadpool->num_threads;
+    memset(threadpool->active_threads, 0, threadpool->num_threads * sizeof(bool));
 }

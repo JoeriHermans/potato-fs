@@ -70,6 +70,11 @@ typedef struct _threadpool {
     size_t num_threads;
 } threadpool_t;
 
+struct _threadpool_thread_main_args {
+    threadpool_t * threadpool;
+    unsigned int thread_index;
+};
+
 bool threadpool_running(const threadpool_t * threadpool);
 
 bool threadpool_wakeup_possible(threadpool_t * threadpool);
@@ -92,14 +97,18 @@ void threadpool_free(threadpool_t * threadpool);
 
 void threadpool_stop(threadpool_t * threadpool);
 
-void threadpool_thread_main(threadpool_t * threadpool, const unsigned int thread_index);
+void * threadpool_thread_main(void * argument);
 
 void threadpool_thread_wakeup(threadpool_t * threadpool, const unsigned int thread_index);
 
 void threadpool_wakeup(threadpool_t * threadpool);
 
+void threadpool_wakeup_all(threadpool_t * threadpool);
+
 void threadpool_increase_active_threads(threadpool_t * threadpool, const unsigned int thread_index);
 
 void threadpool_decrease_active_threads(threadpool_t * threadpool, const unsigned int thread_index);
+
+void threadpool_join(threadpool_t * threadpool);
 
 #endif

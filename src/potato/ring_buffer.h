@@ -69,9 +69,14 @@
 
 #define ring_buffer_insert(BUFFER, ELEMENT) \
     { \
-    int next_index = ring_buffer_next_tail_index(BUFFER); \
-    (BUFFER)->buffer[next_index] = ELEMENT; \
-    (BUFFER)->index_tail = next_index; \
+    if(ring_buffer_is_empty(BUFFER)) { \
+        (BUFFER)->buffer[(BUFFER)->index_tail] = ELEMENT; \
+        (BUFFER)->index_tail = ring_buffer_next_tail_index(BUFFER); \
+    } else { \
+        int next_index = ring_buffer_next_tail_index(BUFFER); \
+        (BUFFER)->buffer[next_index] = ELEMENT; \
+        (BUFFER)->index_tail = next_index; \
+    } \
     }
 
 #define ring_buffer_delete_head(BUFFER) \
