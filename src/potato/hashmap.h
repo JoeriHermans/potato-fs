@@ -55,6 +55,8 @@ typedef struct _hashmap {
 
 bool hashmap_exists(const map_t * map, const char * key);
 
+double hashmap_efficiency(const map_t * map);
+
 int hashmap_get(const map_t * map, const char * key, void ** buffer);
 
 int hashmap_hash(const map_t * map, const char * key);
@@ -64,6 +66,10 @@ int hashmap_put(map_t * map, const char * key, void * data);
 int hashmap_remove(map_t * map, const char * key);
 
 size_t hashmap_size(const map_t * map);
+
+size_t hashmap_num_free_bins(const map_t * map);
+
+size_t hashmap_num_occupied_bins(const map_t * map);
 
 map_t * hashmap_new(void);
 
