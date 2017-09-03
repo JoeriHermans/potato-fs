@@ -56,6 +56,7 @@ typedef struct _threadpool_task {
 ring_buffer_define(threadpool_task_t *, ring_buffer_threadpool_task_t);
 
 typedef struct _threadpool {
+    bool running;
     bool * active_threads;
     pthread_mutex_t mutex_task_buffer;
     pthread_mutex_t mutex_threads;
@@ -67,7 +68,9 @@ typedef struct _threadpool {
     size_t num_threads;
 } threadpool_t;
 
-bool threadpool_wakeup_possible(const threadpool_t * threadpool);
+bool threadpool_running(const threadpool_t * threadpool);
+
+bool threadpool_wakeup_possible(threadpool_t * threadpool);
 
 bool threadpool_queue_full(threadpool_t * threadpool);
 
@@ -80,5 +83,7 @@ threadpool_t * threadpool_new(const size_t max_tasks, const size_t num_threads);
 threadpool_t * threadpool_new_default(void);
 
 void threadpool_free(threadpool_t * threadpool);
+
+void threadpool_stop(threadpool_t * threadpool);
 
 #endif

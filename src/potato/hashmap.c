@@ -61,7 +61,11 @@ double hashmap_efficiency(const map_t * hashmap) {
     size_t num_entries;
     size_t num_bins;
 
-    // TODO Implement.
+    num_bins = hashmap->num_bins;
+    for(size_t i = 0; i < num_bins; ++i)
+        if(hashmap->bin[i].key)
+            ++num_entries;
+    efficiency = (double) num_entries / (double) num_bins;
 
     return efficiency;
 }

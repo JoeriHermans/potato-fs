@@ -34,6 +34,20 @@
 
 // END Includes. /////////////////////////////////////////////////////
 
+bool threadpool_running(const threadpool_t * threadpool) {
+    return threadpool->running;
+}
+
+bool threadpool_wakeup_possible(threadpool_t * threadpool) {
+    bool wakeup_possible;
+
+    pthread_mutex_lock(&threadpool->mutex_threads);
+    wakeup_possible = threadpool->num_inactive_threads > 0;
+    pthread_mutex_unlock(&threadpool->mutex_threads);
+
+    return wakeup_possible;
+}
+
 bool threadpool_queue_full(threadpool_t * threadpool) {
     bool success;
 
@@ -77,6 +91,7 @@ threadpool_t * threadpool_new(const size_t max_tasks, const size_t num_threads) 
 
     threadpool = (threadpool_t *) malloc(sizeof(threadpool_t));
     memset(threadpool, 0, sizeof(threadpool_t));
+    threadpool->running = true;
     threadpool->max_tasks = max_tasks;
     threadpool->num_threads = num_threads;
     ring_buffer_initialize(&threadpool->task_buffer, max_tasks, threadpool_task_t *);
@@ -106,4 +121,8 @@ void threadpool_free(threadpool_t * threadpool) {
     free(threadpool->threads);
     free(threadpool->active_threads);
     free(threadpool);
+}
+
+void threadpool_stop(threadpool_t * threadpool) {
+    threadpool->running = false;
 }
