@@ -28,10 +28,53 @@
 
 // System dependencies.
 #include <assert.h>
-#include <string.h>
 #include <pthread.h>
+#include <string.h>
+#include <unistd.h>
 
 // END Includes. /////////////////////////////////////////////////////
+
+bool threadpool_full(threadpool_t * threadpool) {
+    bool full;
+
+    // Checking the precondition.
+    assert(threadpool != NULL);
+
+    pthread_mutex_lock(&threadpool->mutex_task_buffer);
+    full = ring_buffer_is_full(&threadpool->task_buffer);
+    pthread_mutex_unlock(&threadpool->mutex_task_buffer);
+
+    return full;
+}
+
+bool threadpool_wakeup_possible(const threadpool_t * threadpool) {
+    bool wakeup_possible;
+
+    // TODO Implement.
+
+    return wakeup_possible;
+}
+
+int threadpool_enqueue(threadpool_t * threadpool, threadpool_task_t * task) {
+    int result;
+
+    pthread_mutex_lock(&threadpool->mutex_task_buffer);
+    // Check if the task buffer is full.
+    if(!ring_buffer_is_full(&threadpool->task_buffer)) {
+        ring_buffer_insert(&threadpool->task_buffer, task);
+        result = THREADPOOL_STATUS_OK;
+    } else {
+        result = THREADPOOL_STATUS_QUEUE_FULL;
+    }
+    pthread_mutex_unlock(&threadpool->mutex_task_buffer);
+    // Check if a thread needs to be woken up.
+    if(threadpool_wakeup_possible(threadpool)) {
+        // Wakeup a thread.
+        // TODO Implement.
+    }
+
+    return result;
+}
 
 threadpool_t * threadpool_new(const size_t max_tasks, const size_t num_threads) {
     threadpool_t * threadpool;
@@ -43,8 +86,12 @@ threadpool_t * threadpool_new(const size_t max_tasks, const size_t num_threads) 
     memset(threadpool, 0, sizeof(threadpool_t));
     threadpool->max_tasks = max_tasks;
     threadpool->num_threads = num_threads;
-    ring_buffer_initialize(&threadpool->task_buffer, max_tasks, threadpool_task_t);
+    ring_buffer_initialize(&threadpool->task_buffer, max_tasks, threadpool_task_t *);
     pthread_mutex_init(&threadpool->mutex_task_buffer, NULL);
+    pthread_mutex_init(&threadpool->mutex_thread, NULL);
+    threadpool->threads = (pthread_t *) calloc(num_threads, sizeof(pthread_t));
+    threadpool->active_threads = (bool *) calloc(num_threads, sizeof(bool));
+    memset(threadpool->active_threads, 0, num_threads * sizeof(bool));
 
     return threadpool;
 }
@@ -60,7 +107,10 @@ void threadpool_free(threadpool_t * threadpool) {
     assert(threadpool != NULL);
 
     pthread_mutex_destroy(&threadpool->mutex_task_buffer);
+    pthread_mutex_destroy(&threadpool->mutex_thread);
     ring_buffer = &threadpool->task_buffer;
     ring_buffer_destroy(ring_buffer);
+    free(threadpool->threads);
+    free(threadpool->active_threads);
     free(threadpool);
 }
