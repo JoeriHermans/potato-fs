@@ -88,10 +88,8 @@ int threadpool_enqueue(threadpool_t * threadpool, threadpool_task_t * task) {
     }
     pthread_mutex_unlock(&threadpool->mutex_task_buffer);
     // Check if a thread needs to be woken up.
-    if(threadpool_wakeup_possible(threadpool)) {
-        // Wakeup a thread.
-        // TODO Implement.
-    }
+    if(threadpool_wakeup_possible(threadpool))
+        threadpool_wakeup(threadpool);
 
     return result;
 }
@@ -173,22 +171,71 @@ void threadpool_thread_main(threadpool_t * threadpool, const unsigned int thread
     pthread_mutex_init(lock, NULL);
     pthread_cond_init(condition, NULL);
     // Start the thread task.
+    threadpool_increase_active_threads(threadpool, thread_index);
     pthread_mutex_lock(lock);
     // Run until the threadpool has to run.
     while(threadpool_running(threadpool)) {
         // Check if there are tasks left to be processed.
-        if(threadpool_queue_empty(threadpool))
+        if(threadpool_queue_empty(threadpool)) {
+            threadpool_decrease_active_threads(threadpool, thread_index);
             pthread_cond_wait(condition, lock);
+            threadpool_increase_active_threads(threadpool, thread_index);
+        }
         // Fetch the next task from the task buffer.
         task = threadpool_dequeue(threadpool);
         if(task) {
-            // Run dequeued task.
-            // TODO Implement.
+            // TODO Implement running task.
+            printf("Running task from thread %u.\n", thread_index);
+            task->ready = true;
         }
     }
     // Edn the thread task.
     pthread_mutex_unlock(lock);
+    threadpool_decrease_active_threads(threadpool, thread_index);
     // Free the allocated mutex and condition variable.
     pthread_cond_destroy(condition);
     pthread_mutex_destroy(lock);
+}
+
+void threadpool_thread_wakeup(threadpool_t * threadpool, const unsigned int thread_index) {
+    pthread_mutex_t * lock;
+    pthread_cond_t * condition;
+
+    lock = &threadpool->mutex_cond_threads[thread_index];
+    condition = &threadpool->condition_threads[thread_index];
+    pthread_mutex_lock(lock);
+    pthread_cond_signal(condition);
+    pthread_mutex_unlock(lock);
+}
+
+void threadpool_wakeup(threadpool_t * threadpool) {
+    size_t num_threads;
+
+    num_threads = threadpool->num_threads;
+    pthread_mutex_lock(&threadpool->mutex_threads);
+    if(threadpool->num_inactive_threads > 0) {
+        for(unsigned int i = 0; i < num_threads; ++i) {
+            if(!threadpool->active_threads[i]) {
+                threadpool_thread_wakeup(threadpool, i);
+                break;
+            }
+        }
+    }
+    pthread_mutex_unlock(&threadpool->mutex_threads);
+}
+
+void threadpool_increase_active_threads(threadpool_t * threadpool, const unsigned int thread_index) {
+    pthread_mutex_lock(&threadpool->mutex_threads);
+    threadpool->active_threads[thread_index] = true;
+    ++threadpool->num_active_threads;
+    --threadpool->num_inactive_threads;
+    pthread_mutex_unlock(&threadpool->mutex_threads);
+}
+
+void threadpool_decrease_active_threads(threadpool_t * threadpool, const unsigned int thread_index) {
+    pthread_mutex_lock(&threadpool->mutex_threads);
+    threadpool->active_threads[thread_index] = false;
+    --threadpool->num_active_threads;
+    ++threadpool->num_inactive_threads;
+    pthread_mutex_unlock(&threadpool->mutex_threads);
 }

@@ -94,4 +94,12 @@ void threadpool_stop(threadpool_t * threadpool);
 
 void threadpool_thread_main(threadpool_t * threadpool, const unsigned int thread_index);
 
+void threadpool_thread_wakeup(threadpool_t * threadpool, const unsigned int thread_index);
+
+void threadpool_wakeup(threadpool_t * threadpool);
+
+void threadpool_increase_active_threads(threadpool_t * threadpool, const unsigned int thread_index);
+
+void threadpool_decrease_active_threads(threadpool_t * threadpool, const unsigned int thread_index);
+
 #endif
