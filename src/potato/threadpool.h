@@ -60,6 +60,8 @@ typedef struct _threadpool {
     bool * active_threads;
     pthread_mutex_t mutex_task_buffer;
     pthread_mutex_t mutex_threads;
+    pthread_mutex_t * mutex_cond_threads;
+    pthread_cond_t * condition_threads;
     pthread_t * threads;
     ring_buffer_threadpool_task_t task_buffer;
     size_t max_tasks;
@@ -74,6 +76,8 @@ bool threadpool_wakeup_possible(threadpool_t * threadpool);
 
 bool threadpool_queue_full(threadpool_t * threadpool);
 
+bool threadpool_queue_empty(threadpool_t * threadpool);
+
 bool threadpool_has_inactive_threads(const threadpool_t * threadpool);
 
 int threadpool_enqueue(threadpool_t * threadpool, threadpool_task_t * task);
@@ -82,8 +86,12 @@ threadpool_t * threadpool_new(const size_t max_tasks, const size_t num_threads);
 
 threadpool_t * threadpool_new_default(void);
 
+threadpool_task_t * threadpool_dequeue(threadpool_t * threadpool);
+
 void threadpool_free(threadpool_t * threadpool);
 
 void threadpool_stop(threadpool_t * threadpool);
+
+void threadpool_thread_main(threadpool_t * threadpool, const unsigned int thread_index);
 
 #endif

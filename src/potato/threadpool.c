@@ -49,13 +49,23 @@ bool threadpool_wakeup_possible(threadpool_t * threadpool) {
 }
 
 bool threadpool_queue_full(threadpool_t * threadpool) {
-    bool success;
+    bool full;
 
     pthread_mutex_lock(&threadpool->mutex_task_buffer);
-    success = ring_buffer_is_full(&threadpool->task_buffer);
+    full = ring_buffer_is_full(&threadpool->task_buffer);
     pthread_mutex_unlock(&threadpool->mutex_task_buffer);
 
-    return success;
+    return full;
+}
+
+bool threadpool_queue_empty(threadpool_t * threadpool) {
+    bool empty;
+
+    pthread_mutex_lock(&threadpool->mutex_task_buffer);
+    empty = !ring_buffer_is_full(&threadpool->task_buffer);
+    pthread_mutex_unlock(&threadpool->mutex_task_buffer);
+
+    return empty;
 }
 
 bool threadpool_has_inactive_threads(const threadpool_t * threadpool) {
@@ -64,6 +74,9 @@ bool threadpool_has_inactive_threads(const threadpool_t * threadpool) {
 
 int threadpool_enqueue(threadpool_t * threadpool, threadpool_task_t * task) {
     int result;
+
+    // Checking the precondition.
+    assert(task->ready == false);
 
     pthread_mutex_lock(&threadpool->mutex_task_buffer);
     // Check if the task buffer is full.
@@ -100,6 +113,10 @@ threadpool_t * threadpool_new(const size_t max_tasks, const size_t num_threads) 
     threadpool->threads = (pthread_t *) calloc(num_threads, sizeof(pthread_t));
     threadpool->active_threads = (bool *) calloc(num_threads, sizeof(bool));
     memset(threadpool->active_threads, 0, num_threads * sizeof(bool));
+    threadpool->mutex_cond_threads = (pthread_mutex_t *) calloc(num_threads, sizeof(pthread_mutex_t));
+    memset(threadpool->mutex_cond_threads, 0, num_threads * sizeof(pthread_mutex_t));
+    threadpool->condition_threads = (pthread_cond_t *) calloc(num_threads, sizeof(pthread_cond_t));
+    memset(threadpool->condition_threads, 0, num_threads * sizeof(pthread_cond_t));
 
     return threadpool;
 }
@@ -108,12 +125,32 @@ threadpool_t * threadpool_new_default(void) {
     return threadpool_new(THREADPOOL_DEFAULT_MAX_TASKS, THREADPOOL_DEFAULT_NUM_THREADS);
 }
 
+threadpool_task_t * threadpool_dequeue(threadpool_t * threadpool) {
+    ring_buffer_threadpool_task_t * buffer;
+    threadpool_task_t * task;
+
+    buffer = &threadpool->task_buffer;
+    pthread_mutex_lock(&threadpool->mutex_task_buffer);
+    if(!ring_buffer_is_empty(buffer)) {
+        task = ring_buffer_peek_head(buffer);
+        ring_buffer_delete_head(buffer);
+    } else {
+        task = NULL;
+    }
+    pthread_mutex_unlock(&threadpool->mutex_task_buffer);
+
+    return task;
+}
+
 void threadpool_free(threadpool_t * threadpool) {
     ring_buffer_threadpool_task_t * ring_buffer;
 
     // Checking the precondition.
     assert(threadpool != NULL);
 
+    // TODO Add thread stopping.
+    free(threadpool->mutex_cond_threads);
+    free(threadpool->condition_threads);
     pthread_mutex_destroy(&threadpool->mutex_task_buffer);
     pthread_mutex_destroy(&threadpool->mutex_threads);
     ring_buffer = &threadpool->task_buffer;
@@ -125,4 +162,33 @@ void threadpool_free(threadpool_t * threadpool) {
 
 void threadpool_stop(threadpool_t * threadpool) {
     threadpool->running = false;
+}
+
+void threadpool_thread_main(threadpool_t * threadpool, const unsigned int thread_index) {
+    pthread_mutex_t * lock = &threadpool->mutex_cond_threads[thread_index];
+    pthread_cond_t * condition = &threadpool->condition_threads[thread_index];
+    threadpool_task_t * task;
+
+    // Allocate the thread mutex and condition variable.
+    pthread_mutex_init(lock, NULL);
+    pthread_cond_init(condition, NULL);
+    // Start the thread task.
+    pthread_mutex_lock(lock);
+    // Run until the threadpool has to run.
+    while(threadpool_running(threadpool)) {
+        // Check if there are tasks left to be processed.
+        if(threadpool_queue_empty(threadpool))
+            pthread_cond_wait(condition, lock);
+        // Fetch the next task from the task buffer.
+        task = threadpool_dequeue(threadpool);
+        if(task) {
+            // Run dequeued task.
+            // TODO Implement.
+        }
+    }
+    // Edn the thread task.
+    pthread_mutex_unlock(lock);
+    // Free the allocated mutex and condition variable.
+    pthread_cond_destroy(condition);
+    pthread_mutex_destroy(lock);
 }

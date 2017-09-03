@@ -77,9 +77,9 @@
 #define ring_buffer_delete_head(BUFFER) \
     (BUFFER)->index_head = ring_buffer_next_head_index(BUFFER)
 
-#define ring_buffer_peek_head(BUFFER) (BUFFER)->buffer[BUFFER.index_head]
+#define ring_buffer_peek_head(BUFFER) (BUFFER)->buffer[(BUFFER)->index_head]
 
-#define ring_buffer_peek_tail(BUFFER) (BUFFER)->buffer[BUFFER.index_tail]
+#define ring_buffer_peek_tail(BUFFER) (BUFFER)->buffer[(BUFFER)->index_tail]
 
 #define ring_buffer_insert_buffer(BUFFER, ELEMENTS, NUM_ELEMENTS) \
     { \
