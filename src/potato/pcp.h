@@ -41,6 +41,15 @@
 #define PCP_HEADER_SIZE 192
 #define PCP_VERSION 2
 
+#define PCP_STATUS_SUCCESS 0
+#define PCP_STATUS_UNSUPP_VERSION 1
+#define PCP_STATUS_NOT_AUTHORIZED 2
+#define PCP_STATUS_MALFORMED_REQUEST 3
+#define PCP_STATUS_UNSUPP_OPCODE 4
+#define PCP_STATUS_UNSUPP_OPTION 5
+#define PCP_STATUS_MALFORMED_OPTION 6
+#define PCP_STATUS_NETWORK_FAILURE 7
+
 struct pcp_response_header {
     uint8_t _reserved;
     uint8_t result_code;
@@ -79,5 +88,9 @@ void pcp_clear_opcode(struct pcp_header * header);
 void pcp_set_response(struct pcp_header * header);
 
 void pcp_set_request(struct pcp_header * header);
+
+void pcp_option_set_mandatory(struct pcp_option * options);
+
+void pcp_option_set_optional(struct pcp_option * options);
 
 #endif

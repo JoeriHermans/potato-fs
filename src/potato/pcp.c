@@ -49,3 +49,11 @@ void pcp_set_response(struct pcp_header * header) {
 void pcp_set_request(struct pcp_header * header) {
     header->opcode |= 0 << 8;
 }
+
+void pcp_option_set_mandatory(struct pcp_option * options) {
+    options->option_code = 0x00;
+}
+
+void pcp_option_set_options(struct pcp_option * options) {
+    options->option_code = 0x01;
+}
