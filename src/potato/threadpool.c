@@ -189,9 +189,8 @@ void * threadpool_thread_main(void * argument) {
     while(threadpool_running(threadpool)) {
         // Fetch the next task from the task buffer.
         task = threadpool_dequeue(threadpool);
-        if(task) {
-            // TODO Implement running task.
-            printf("Running task from thread %u.\n", thread_index);
+        if(task && task->method) {
+            task->result = task->method(task->argument);
             task->ready = true;
         }
         // Check if there are tasks left to be processed.

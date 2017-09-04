@@ -47,7 +47,7 @@
 
 typedef struct _threadpool_task {
     void * argument;
-    void * method;
+    void * (* method)(void *);
     void * result;
     bool ready;
 } threadpool_task_t;
