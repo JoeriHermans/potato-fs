@@ -85,6 +85,8 @@ bool threadpool_queue_empty(threadpool_t * threadpool);
 
 bool threadpool_has_inactive_threads(const threadpool_t * threadpool);
 
+bool threadpool_task_ready(const threadpool_task_t * task);
+
 int threadpool_enqueue(threadpool_t * threadpool, threadpool_task_t * task);
 
 threadpool_t * threadpool_new(const size_t max_tasks, const size_t num_threads);

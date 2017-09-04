@@ -72,6 +72,10 @@ bool threadpool_has_inactive_threads(const threadpool_t * threadpool) {
     return threadpool->num_inactive_threads > 0;
 }
 
+bool threadpool_task_ready(const threadpool_task_t * task) {
+    return task->ready;
+}
+
 int threadpool_enqueue(threadpool_t * threadpool, threadpool_task_t * task) {
     int result;
 

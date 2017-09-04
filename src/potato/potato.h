@@ -60,6 +60,7 @@
 struct potatofs {
     bool daemonize;
     bool block_sharing;
+    bool data_node;
     char * data_directory;
     char * mountpoint;
     size_t default_block_replication;
@@ -81,6 +82,8 @@ void potato_init_struct_data_directory(struct potatofs * potatofs, const map_t *
 void potato_init_struct_default_block_size(struct potatofs * potatofs, const map_t * settings);
 
 void potato_init_struct_block_sharing(struct potatofs * potatofs, const map_t * settings);
+
+void potato_init_struct_data_node(struct potatofs * potatofs, const map_t * settings);
 
 void  * potato_init(struct fuse_conn_info * conn, struct fuse_config * config);
 

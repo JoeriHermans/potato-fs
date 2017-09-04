@@ -67,6 +67,7 @@ const char k_log_stopping_potato[] = "Stopping PotatoFS, unmounted FUSE filesyst
 const char k_config_blank_characters[] = "\r\n\t# ";
 const char k_config_block_sharing[] = "block_sharing";
 const char k_config_comment = '#';
+const char k_config_data_node[] = "data_node";
 const char k_config_daemonize[] = "daemonize";
 const char k_config_data_directory[] = "data_directory";
 const char k_config_default_block_replication[] = "default_block_replication";

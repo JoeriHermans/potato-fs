@@ -143,6 +143,7 @@ void potato_init_struct(struct potatofs * potatofs, const map_t * settings) {
     potato_init_struct_data_directory(potatofs, settings);
     potato_init_struct_default_block_size(potatofs, settings);
     potato_init_struct_block_sharing(potatofs, settings);
+    potato_init_struct_data_node(potatofs, settings);
 }
 
 void potato_init_struct_mountpoint(struct potatofs * potatofs, const map_t * settings) {
@@ -274,6 +275,13 @@ void potato_init_struct_block_sharing(struct potatofs * potatofs, const map_t * 
         syslog(LOG_NOTICE, k_config_default_value, k_config_block_sharing, POTATO_SETTING_DEFAULT_BLOCK_SHARING);
         potatofs->daemonize = POTATO_SETTING_DEFAULT_BLOCK_SHARING;
     }
+}
+
+void potato_init_struct_data_node(struct potatofs * potatofs, const map_t * settings) {
+    // Checking the precondition.
+    assert(potatofs != NULL && settings != NULL);
+
+    // TODO Implement.
 }
 
 void * potato_init(struct fuse_conn_info * conn, struct fuse_config * config) {

@@ -63,6 +63,7 @@ extern const char k_log_stopping_potato[];
 extern const char k_config_blank_characters[];
 extern const char k_config_block_sharing[];
 extern const char k_config_comment;
+extern const char k_data_node[];
 extern const char k_config_daemonize[];
 extern const char k_config_data_directory[];
 extern const char k_config_default_block_replication[];
