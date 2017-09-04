@@ -29,6 +29,7 @@
 #include <potato/main.h>
 #include <potato/potato.h>
 #include <potato/ring_buffer.h>
+#include <potato/threadpool.h>
 
 // System dependencies.
 #include <stdbool.h>
@@ -91,7 +92,24 @@ int run_mode_daemon(const int argc, const char ** argv) {
 }
 
 int run_mode_user(const int argc, const char ** argv) {
+    //puts("Testing");
+    //threadpool_t * threadpool = threadpool_new_default();
+    //threadpool_task_t task;
+    //memset(&task, 0, sizeof(threadpool_task_t));
+    //threadpool_enqueue(threadpool, &task);
+    //usleep(5000000);
+    //puts("Enqueing again.");
+    //task.ready = false;
+    //threadpool_enqueue(threadpool, &task);
+    //usleep(5000000);
+    //threadpool_stop(threadpool);
+    //puts("Waiting for threads to be done and stuff.");
+    //threadpool_join(threadpool);
+    //puts("Threads joined.");
+    //threadpool_free(threadpool);
+    //puts("Done");
     // TODO Implement.
+
     return EXIT_SUCCESS;
 }
 
