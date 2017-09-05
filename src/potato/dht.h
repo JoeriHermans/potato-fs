@@ -38,13 +38,40 @@
 #define DHT_HASH_ITERATIONS 100
 #define DHT_VERSION 1
 
+#define DHT_OPCODE_NOOP 0
+#define DHT_OPCODE_DELETE 1
+#define DHT_OPCODE_GET 2
+#define DHT_OPCODE_PING 3
+#define DHT_OPCODE_PONG 4
+#define DHT_OPCODE_PUT 5
+
+typedef struct dht {
+    // TODO Implement.
+} dht_t;
+
 struct dht_contact {
-    unsigned char version;
-    unsigned char id[DHT_KEY_SPACE_SIZE_BYTES];
-    unsigned char address[DHT_INTERNET_ADDRESS_SIZE];
+    uint8_t id[DHT_KEY_SPACE_SIZE_BYTES];
+    uint8_t address[DHT_INTERNET_ADDRESS_SIZE];
     uint16_t port;
 } __attribute__((packed));
 
+struct dht_message {
+    uint8_t version;
+    uint8_t opcode;
+    uint16_t identifier;
+    union {
+        struct dht_contact contact;
+    } payload;
+} __attribute__((packed));
+
+dht_t * dht_create(void);
+
+void dht_destroy(dht_t * dht);
+
 void dht_generate_id(unsigned char * id);
+
+void dht_message_initialize(struct dht_message * message);
+
+void dht_contact_set_id(struct dht_contact * contact, const uint8_t * id);
 
 #endif
