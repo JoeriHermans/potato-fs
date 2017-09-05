@@ -40,6 +40,7 @@ extern const char k_program_name[];
 extern const char k_trim_characters[];
 extern const char k_true[];
 extern const size_t k_trim_num_characters;
+extern const char k_dev_urandom[];
 
 extern const char k_arg_config[];
 extern const char k_arg_config_s[];

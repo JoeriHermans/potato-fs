@@ -30,6 +30,7 @@
 #include <potato/potato.h>
 #include <potato/ring_buffer.h>
 #include <potato/threadpool.h>
+#include <potato/util.h>
 
 // System dependencies.
 #include <stdbool.h>
@@ -92,6 +93,11 @@ int run_mode_daemon(const int argc, const char ** argv) {
 }
 
 int run_mode_user(const int argc, const char ** argv) {
+    size_t buffer_size = 32;
+    unsigned char buffer[buffer_size];
+    generate_random_bytes(buffer, buffer_size);
+    for(size_t i = 0; i < buffer_size; ++i)
+        printf("%x", buffer[i]);
     //puts("Testing");
     //threadpool_t * threadpool = threadpool_new_default();
     //threadpool_task_t task;

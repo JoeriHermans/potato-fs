@@ -61,6 +61,11 @@
 
 #define arraylist_at(BUFFER, INDEX) ((BUFFER)->buffer[index])
 
+#define arraylist_resize(BUFFER) \
+    size_t newsize = (BUFFER)->size * 2; \
+    (BUFFER)->buffer = realloc((BUFFER)->buffer, newsize); \
+    (BUFFER)->size = newsize;
+
 #define arraylist_append(BUFFER, ELEMENT) \
     { \
     if(arraylist_is_full(BUFFER)) \

@@ -43,6 +43,7 @@ const char k_newline = '\n';
 const char k_program_name[] = "potato";
 const char k_trim_characters[] = "\t\r\n ";
 const char k_true[] = "true";
+const char k_dev_urandom[] = "/dev/urandom";
 const size_t k_trim_num_characters = strlen(k_trim_characters);
 
 const char k_arg_config[] = "--config";

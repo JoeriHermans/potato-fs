@@ -26,6 +26,12 @@
 #include <potato/constants.h>
 #include <potato/util.h>
 
+// System dependencies.
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <unistd.h>
+
 // END Includes. /////////////////////////////////////////////////////
 
 char * copy_string(const char * str) {
@@ -129,4 +135,38 @@ bool is_unsigned_integer(const char * str) {
     }
 
     return true;
+}
+
+void generate_random_bytes(unsigned char * buffer, const size_t buffer_size) {
+    int fd;
+
+    fd = open(k_dev_urandom, O_RDONLY);
+    if(fd >= 0) {
+        read_all(fd, buffer, buffer_size);
+        close(fd);
+    } else {
+        memset(buffer, 0, buffer_size);
+    }
+}
+
+int read_all(const int fd, void * buffer, const size_t size) {
+    size_t total_read;
+    int num_read;
+    int bytes_left;
+    int result;
+
+    total_read = 0;
+    result = 0;
+    bytes_left = (int) size;
+    while(total_read != size && result != -1) {
+        num_read = read(fd, buffer + total_read, bytes_left);
+        if(num_read < 0) {
+            result = -1;
+            break;
+        }
+        bytes_left -= num_read;
+        total_read += (size_t) num_read;
+    }
+
+    return result;
 }

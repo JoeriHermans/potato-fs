@@ -50,4 +50,8 @@ int character_index(const char * str, const char c);
 
 bool is_unsigned_integer(const char * str);
 
+void generate_random_bytes(unsigned char * buffer, const size_t buffer_size);
+
+int read_all(const int fd, void * buffer, const size_t size);
+
 #endif
