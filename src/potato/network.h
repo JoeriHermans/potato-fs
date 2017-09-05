@@ -37,8 +37,6 @@
 
 // END Includes. /////////////////////////////////////////////////////
 
-int network_allocate_tcp_port(const uint16_t port);
-
 bool network_cork_disable(const int fd);
 
 bool network_cork_enable(const int fd);
@@ -50,6 +48,12 @@ bool network_keep_alive_enable(const int fd);
 bool network_nagle_disable(const int fd);
 
 bool network_nagle_enable(const int fd);
+
+int network_allocate_tcp_port(const uint16_t port);
+
+int network_allocate_udp_port(const uint16_t port);
+
+int network_allocate_udp_socket(void);
 
 int network_connect(const char * address, const uint16_t port);
 

@@ -76,6 +76,37 @@ int network_allocate_tcp_port(const uint16_t port) {
     return result;
 }
 
+int network_allocate_udp_port(const uint16_t port) {
+    static int yes = 1;
+    struct sockaddr_in in;
+    int fd = -1;
+
+    // Checking the precondition.
+    assert(port > 0);
+
+    fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if(fd >= 0) {
+        in.sin_family = AF_INET;
+        in.sin_port = htons(port);
+        in.sin_addr.s_addr = htonl(INADDR_ANY);
+        setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof yes);
+        if(bind(fd, (struct sockaddr *) &in, sizeof(in)) == 1) {
+            close(fd);
+            fd = -1;
+        }
+    }
+
+    return fd;
+}
+
+int network_allocate_udp_socket(void) {
+    int fd = -1;
+
+    fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+
+    return fd;
+}
+
 bool network_cork_disable(const int fd) {
     static const int optval = 1;
     bool success;
