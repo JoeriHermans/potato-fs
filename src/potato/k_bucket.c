@@ -1,8 +1,7 @@
 /**
- * Routing table specifically designed for a distributed hash table
- * implementing the Kameldia scheme.
+ * k-bucket implementation according to the Kademlia paper.
  *
- * @date                    05 09 2017
+ * @date                    07 09 2017
  * @author                  Joeri HERMANS
  * @version                 0.1
  *
@@ -21,23 +20,25 @@
  * limitations under the License.
  */
 
-#findef _H_DHT_ROUTING_TABLE_
-#define _H_DHT_ROUTING_TABLE_
-
 // BEGIN Includes. ///////////////////////////////////////////////////
 
 // Application dependencies.
-#include <potato/dht.h>
+#include <potato/k_bucket.h>
 
 // System dependencies.
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <assert.h>
+#include <string.h>
+#include <unistd.h>
 
 // END Includes. /////////////////////////////////////////////////////
 
-// TODO Implement.
+k_bucket_t * k_bucket_create(const size_t k, const size_t key_length) {
+    k_bucket_t * k_bucket = NULL;
 
-#endif
+    // Checking the precondition.
+    assert(k > 0 && key_length > 0);
+
+    // TODO Implement.
+
+    return k_bucket;
+}

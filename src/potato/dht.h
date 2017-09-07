@@ -49,8 +49,12 @@ typedef struct dht {
     // TODO Implement.
 } dht_t;
 
+struct dht_key {
+    uint8_t key[DHT_KEY_SPACE_SIZE_BYTES];
+} __attribute__((packed));
+
 struct dht_contact {
-    uint8_t id[DHT_KEY_SPACE_SIZE_BYTES];
+    struct dht_key id;
     uint8_t address[DHT_INTERNET_ADDRESS_SIZE];
     uint16_t port;
 } __attribute__((packed));
@@ -63,6 +67,12 @@ struct dht_message {
         struct dht_contact contact;
     } payload;
 } __attribute__((packed));
+
+bool dht_key_equal(const struct dht_key * a, const struct dht_key * b);
+
+bool dht_key_smaller(const struct dht_key * a, const struct dht_key * b);
+
+bool dht_key_larger(const struct dht_key * a, const struct dht_key * b);
 
 dht_t * dht_create(void);
 

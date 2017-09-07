@@ -33,6 +33,30 @@
 
 // END Includes. /////////////////////////////////////////////////////
 
+bool dht_key_equal(const struct dht_key * a, const struct dht_key * b) {
+    for(int i = 0; i < DHT_KEY_SPACE_SIZE_BYTES; ++i)
+        if(a->key[i] != b->key[i])
+            return false;
+
+    return true;
+}
+
+bool dht_key_smaller(const struct dht_key * a, const struct dht_key * b) {
+    for(int i = 0; i < DHT_KEY_SPACE_SIZE_BYTES; ++i)
+        if(a->key[i] > b->key[i])
+            return false;
+
+    return true;
+}
+
+bool dht_key_larger(const struct dht_key * a, const struct dht_key * b) {
+    for(int i = 0; i < DHT_KEY_SPACE_SIZE_BYTES; ++i)
+        if(a->key[i] < b->key[i])
+            return false;
+
+    return true;
+}
+
 dht_t * dht_create(void) {
     dht_t * dht;
 
@@ -64,5 +88,5 @@ void dht_message_initialize(struct dht_message * message) {
 }
 
 void dht_contact_set_id(struct dht_contact * contact, const uint8_t * id) {
-    memcpy(contact->id, id, DHT_KEY_SPACE_SIZE_BYTES);
+    memcpy(contact->id.key, id, DHT_KEY_SPACE_SIZE_BYTES);
 }
